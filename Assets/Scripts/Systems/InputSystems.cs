@@ -24,9 +24,8 @@ namespace Qf.Systems
         }
         void InputInit()
         {
-            keyValuePairs.Add("Quit", new List<KeyCode>() { KeyCode.Escape });
-            keyValuePairs.Add("Sure", new List<KeyCode>() { KeyCode.Space });
-
+            AddKey("Quit",KeyCode.Escape);
+            AddKey("Sure", KeyCode.Space);
         }
         void Pc()
         {
