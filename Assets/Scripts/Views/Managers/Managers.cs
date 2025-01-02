@@ -6,6 +6,8 @@ namespace Qf.Managers {
     public class Managers : MonoSingleton<Managers>, IController
     {
         [SerializeField]
+        AudioClip audioClip;
+        [SerializeField]
         List<ManagerBase> ManagerOrderOfExecution = new();//¹ÜÀíÆ÷Ö´ÐÐË³Ðò
         Action _UpDate;
         Action _FixedUpDate;
@@ -13,11 +15,20 @@ namespace Qf.Managers {
         void Awake()
         {
             GetArchitecture();
+
             foreach (var manager in ManagerOrderOfExecution)
             {
                 manager.Init();
             }
+
+            OnAwke();
         }
+
+        void OnAwke()
+        {
+            this.SendCommand(new SetEditAudioCommand(audioClip));
+        }
+
         void Update() => _UpDate?.Invoke();
 
         void FixedUpdate() => _FixedUpDate?.Invoke();

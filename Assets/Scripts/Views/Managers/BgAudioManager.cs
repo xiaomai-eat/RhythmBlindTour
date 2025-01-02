@@ -10,7 +10,8 @@ namespace Qf.Managers
 {
     public class BgAudioManager : MonoBehaviour , IController
     {
-        public AudioSource audioSource;//า๔ฦติด
+        [SerializeField]
+        AudioSource audioSource;//า๔ฦติด
         AudioEditModel editModel;
 
         private void Awake()
