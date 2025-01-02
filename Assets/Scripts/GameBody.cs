@@ -1,3 +1,5 @@
+using Qf.Models;
+using Qf.Models.AudioEdit;
 using Qf.Systems;
 using QFramework;
 using UnityEngine;
@@ -12,6 +14,7 @@ public class GameBody : Architecture<GameBody>
     }
     void Models()
     {
+        this.RegisterModel(new AudioEditModel());
         Debug.Log("Modelº”‘ÿÕÍ±œ");
     }
     void Systems()

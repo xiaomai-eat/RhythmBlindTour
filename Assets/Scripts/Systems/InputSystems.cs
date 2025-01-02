@@ -2,7 +2,7 @@ using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
+using Qf.Managers;
 namespace Qf.Systems
 {
     public class InputSystems : AbstractSystem
@@ -20,7 +20,7 @@ namespace Qf.Systems
         protected override void OnInit()
         {
             InputInit();
-            Managers.Instance.AddUpdate(() => Pc());
+            Managers.Managers.Instance.AddUpdate(() => Pc());
         }
         void InputInit()
         {

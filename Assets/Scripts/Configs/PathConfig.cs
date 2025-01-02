@@ -7,6 +7,7 @@ public class PathConfig
     public const string AnimationPath = "Animations/";
     public const string SpritePath = "Sprites/";
     public const string PrefabPath = "Prefabs/SystemGameObjects";
+    public const string AudioPath = "Audios";
     //¾‗Ìו
     //Planting
     public const string SoilSpritePath = "Sprites/Soil";
