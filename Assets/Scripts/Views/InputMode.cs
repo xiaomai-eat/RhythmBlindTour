@@ -7,7 +7,7 @@ public class InputMode : MonoBehaviour
     [SerializeField]
     TheTypeOfOperation operation;
     [SerializeField]
-    DrwmsData drwmsData;
+    DrwmsData drwmsData = new();
     [SerializeField]
     float TimeOfExistence;//鼓点存在时间
     //[SerializeField]

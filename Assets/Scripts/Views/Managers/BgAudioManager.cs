@@ -18,12 +18,7 @@ namespace Qf.Managers
         int Mode;
         private void Awake()
         {
-            
-        }
-        public void Test()
-        {
-            audioSource.Play();
-            Mode = 1;
+                
         }
         void Init()
         {
