@@ -1,4 +1,5 @@
 using Qf.ClassDatas;
+using Qf.Commands.AudioEdit;
 using Qf.Events;
 using Qf.Models;
 using Qf.Models.AudioEdit;
@@ -13,12 +14,17 @@ namespace Qf.Managers
         [SerializeField]
         AudioSource audioSource;//音频源
         AudioEditModel editModel;
-
+        [SerializeField]
+        int Mode;
         private void Awake()
         {
             
         }
-
+        public void Test()
+        {
+            audioSource.Play();
+            Mode = 1;
+        }
         void Init()
         {
             editModel = this.GetModel<AudioEditModel>();
@@ -26,9 +32,15 @@ namespace Qf.Managers
             {
                 audioSource.clip = editModel.EditAudioClip;
             }
+            this.RegisterEvent<OnEditMode>(v =>
+            {
+                Debug.Log("编辑模式");
+                Mode = 0;
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
             this.RegisterEvent<OnPlayMode>(v =>
             {
                 Debug.Log("游玩模式");
+                Mode = 1;
                 PlayMode();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
@@ -41,8 +53,9 @@ namespace Qf.Managers
             this.RegisterEvent<OnRecordingMode>(v =>
             {
                 Debug.Log("录制模式");
+                Mode = 2;
                 PlayMode();
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<ExitRecordingMode>(v =>
             {
@@ -50,7 +63,11 @@ namespace Qf.Managers
                 ExitPlayMode();
             });
         }
-
+        void UpdateAll()
+        {
+            this.SendCommand(new SetEditAudioThisTimeCommand(audioSource.time));
+            this.SendEvent<OnUpdateThisTime>();
+        }
         void PlayMode()
         {
             audioSource.time = editModel.ThisTime;
@@ -60,7 +77,21 @@ namespace Qf.Managers
         {
             audioSource.Pause();
         }
+        private void Update()
+        {
+            if (Mode == 0)//编辑模式
+            {
 
+            }
+            else if (Mode == 1) //游玩模式
+            {
+                UpdateAll();
+            }
+            else if (Mode == 2)//录制模式
+            {
+                UpdateAll();
+            }
+        }
         void Start()
         {
             Init();

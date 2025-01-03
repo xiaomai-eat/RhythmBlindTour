@@ -13,7 +13,7 @@ namespace Qf.Systems
         public static bool SwipeDown { get; protected set; }
         public static bool SwipeLeft { get; protected set; }
         public static bool SwipeRight { get; protected set; }
-        public static float Click { get; protected set; }
+        public static bool Click { get; protected set; }
         public static float Horizontal { get; protected set; }
         public static float Vertical { get; protected set; }
         static Dictionary<string, List<KeyCode>> keyValuePairs = new();
@@ -24,13 +24,23 @@ namespace Qf.Systems
         }
         void InputInit()
         {
-            AddKey("Quit",KeyCode.Escape);
+            AddKey("Quit", KeyCode.Escape);
             AddKey("Sure", KeyCode.Space);
+            AddKey("SwipeUp", KeyCode.W);
+            AddKey("SwipeDown", KeyCode.S);
+            AddKey("SwipeLeft", KeyCode.A);
+            AddKey("SwipeRight", KeyCode.D);
+            AddKey("Click", KeyCode.Space);
         }
         void Pc()
         {
             Quit = InputQuery("Quit");
             Sure = InputQuery("Sure");
+            SwipeUp = InputQuery("SwipeUp");
+            SwipeDown = InputQuery("SwipeDown");
+            SwipeLeft = InputQuery("SwipeLeft");
+            SwipeRight = InputQuery("SwipeRight");
+            Click = InputQuery("Click");
             Horizontal = Input.GetAxis("Horizontal");
             Vertical = Input.GetAxis("Vertical");
         }
@@ -40,29 +50,38 @@ namespace Qf.Systems
         /// <param name="keyName">操作名称</param>
         /// <param name="and">启用与运算:所有按键同时触发才为true</param>
         /// <returns></returns>
-        bool InputQuery(string keyName, bool and = false)
+        bool InputQuery(string keyName,bool and = false)
         {
-            if (and)
+            if (keyValuePairs[keyName].Count <= 1)//减少查找导致的相应时间变慢非必要不要使用多按键
             {
-                foreach (var key in keyValuePairs[keyName]) 
-                {
-                    if (!Input.GetKey(key))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            foreach (var key in keyValuePairs[keyName])
-            {
-                if (Input.GetKey(key))
-                {
+                if (Input.GetKeyDown(keyValuePairs[keyName][0])){
                     return true;
+                }
+            }
+            else
+            {
+                if (and)
+                {
+                    foreach (var key in keyValuePairs[keyName])
+                    {
+                        if (!Input.GetKeyDown(key))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                foreach (var key in keyValuePairs[keyName])
+                {
+                    if (Input.GetKeyDown(key))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
         }
-        public static void AddKey(string KeyName,KeyCode keyCode)
+        public static void AddKey(string KeyName, KeyCode keyCode)
         {
             if (!keyValuePairs.ContainsKey(KeyName))
             {
@@ -72,10 +91,15 @@ namespace Qf.Systems
             }
             else
             {
+                if (keyValuePairs[KeyName].Contains(keyCode))
+                {
+                    Debug.LogError("该按键已经存在");
+                    return;
+                }
                 keyValuePairs[KeyName].Add(keyCode);
             }
         }
-        public static void RemoveKey(string KeyName,KeyCode keyCode) 
+        public static void RemoveKey(string KeyName, KeyCode keyCode)
         {
             if (!keyValuePairs.ContainsKey(KeyName))
             {

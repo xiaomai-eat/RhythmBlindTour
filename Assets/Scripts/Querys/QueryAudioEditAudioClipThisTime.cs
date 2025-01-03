@@ -1,11 +1,14 @@
-using Qf.Models.AudioEdit;
+﻿using Qf.Models.AudioEdit;
 using QFramework;
-using System.Collections;
+using System;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace Qf.Querys.AudioEdit
 {
-    public class QueryAudioEditAudioClipLength : AbstractQuery<float>
+    public class QueryAudioEditAudioClipThisTime : AbstractQuery<float>
     {
         AudioEditModel audioEditModel;
         protected override float OnDo()
@@ -13,10 +16,9 @@ namespace Qf.Querys.AudioEdit
             audioEditModel = this.GetModel<AudioEditModel>();
             if (audioEditModel.EditAudioClip != null)
             {
-                return audioEditModel.EditAudioClip.length;
+                return audioEditModel.ThisTime;
             }
             return 0;
         }
     }
 }
-

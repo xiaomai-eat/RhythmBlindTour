@@ -6,4 +6,5 @@ namespace Qf.Events
     public struct ExitEditMode { };
     public struct OnRecordingMode { };
     public struct ExitRecordingMode { };
+    public struct OnUpdateThisTime { };
 }

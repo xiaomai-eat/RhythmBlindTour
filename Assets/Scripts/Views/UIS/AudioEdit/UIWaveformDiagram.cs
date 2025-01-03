@@ -20,9 +20,9 @@ public class UIWaveformDiagram : MonoBehaviour, IController
     void Init()
     {
         AudioClip music = this.GetModel<AudioEditModel>().EditAudioClip;
-        Debug.Log(music.name);
-        Debug.Log(music.samples * music.channels);
+        Debug.Log("初始化音乐波形图名称: "+music.name);
         if (music == null) { Debug.Log("没有待处理的音频初始化"); return; }
+        Debug.Log(music.length);
         int musicwaveformwidth = Mathf.CeilToInt(music.length * 100);// 波形宽度
         int dataSum = music.frequency / 100; //数据容量
         float[] samplingData = new float[music.samples * music.channels];//采样数据
@@ -48,7 +48,6 @@ public class UIWaveformDiagram : MonoBehaviour, IController
             Colors[i] = notWaveFormDiagramColor;
         }
         waveformTexture.SetPixels(Colors, 0);
-
         float hscaled = (float)musicwaveformwidth / (float)waveformValue.Length;
         float vscaled = 1;
         int waveformhalfhight = (int)(400 / 2.0f);
@@ -59,7 +58,7 @@ public class UIWaveformDiagram : MonoBehaviour, IController
         for (int i = 0; i < waveformValue.Length; ++i)
         {
             int x = (int)(i * hscaled);
-            int drawWaveformlength = (int)(waveformValue[i] * hscaled);
+            int drawWaveformlength = (int)(waveformValue[i] * vscaled);
             int drawWaveformStartVector = waveformhalfhight - drawWaveformlength;
             int drawWaveformEndVector = waveformhalfhight + drawWaveformlength;
             for (int y = drawWaveformStartVector; y <= drawWaveformEndVector; ++y)
