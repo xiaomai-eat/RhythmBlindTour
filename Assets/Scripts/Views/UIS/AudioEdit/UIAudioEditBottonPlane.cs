@@ -30,12 +30,10 @@ public class UIAudioEditBottonPlane : MonoBehaviour ,IController
         if(bottonPlane.anchoredPosition == new Vector2(0, -400))
         {
             bottonPlane.anchoredPosition = new Vector2(0,0);
-            Debug.Log("1");
         }
         else
         {
             bottonPlane.anchoredPosition = new Vector2(0,-400);
-            Debug.Log("2");
         }
     }
     void Update()
