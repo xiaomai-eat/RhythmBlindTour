@@ -9,12 +9,25 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UITimeHand : MonoBehaviour,IController,IPointerClickHandler
+public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
 {
     [SerializeField]
     RectTransform TimeHand;
     [SerializeField]
     TMP_Text ShowTime;
+    [SerializeField]
+    ScrollRect ScrollRect;
+    public Vector2 TimeHandPos
+    {
+        get
+        {
+            return TimeHand.anchoredPosition;
+        }
+        set
+        {
+            TimeHand.anchoredPosition = value;
+        }
+    }
     private void Start()
     {
         this.RegisterEvent<OnUpdateThisTime>(v =>
@@ -29,29 +42,102 @@ public class UITimeHand : MonoBehaviour,IController,IPointerClickHandler
     void UpdateThisTime()
     {
         float newTime = this.SendQuery(new QueryAudioEditAudioClipThisTime());
-        TimeHand.anchoredPosition = new Vector2(newTime *100,0);
+        TimeHand.anchoredPosition = new Vector2(newTime * 100, 0);
         ShowTime.text = newTime.ToString("0.00");
     }
-
-    public void AddTime()
+    int mode = 0;
+    float Speed;
+    float PressTime;
+    private void Update()
     {
-
+        #region Ä£Ê½ÇÐ»»
+        if (mode == 0)
+        {
+            PressTime = 0;
+        }
+        else if (mode == 1)
+        {
+            if (PressTime >= 0.5f)
+            {
+                AddTime(Speed);
+            }
+            else
+            {
+                PressTime += Time.deltaTime;
+            }
+        }
+        else if (mode == 2)
+        {
+            if (PressTime >= 0.5f)
+            {
+                RemoveTime(Speed);
+            }
+            else
+            {
+                PressTime += Time.deltaTime;
+            }
+        }
+        #endregion
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            RemoveTime(1);
+            RemoveTimeMode(1);
+        }
+        if (Input.GetKeyUp(KeyCode.LeftArrow))
+        {
+            StopTimeMode(0);
+        }
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            AddTime(1);
+            AddTimeMode(1);
+        }
+        if (Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            StopTimeMode(0);
+        }
     }
-    public void RemoveTime()
+    public void AddTimeMode(float Speed)
     {
-
+        mode = 1;
+        this.Speed = Speed;
+    }
+    public void StopTimeMode(float Speed)
+    {
+        mode = 0;
+        this.Speed = Speed;
+    }
+    public void RemoveTimeMode(float Speed)
+    {
+        mode = 2;
+        this.Speed = Speed;
+    }
+    public void AddTime(float Speed)
+    {
+        this.SendCommand(
+            new SetEditAudioThisTimeCommand(
+                this.SendQuery(
+                    new QueryAudioEditAudioClipThisTime()) + 0.01f * Speed));
+        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100)/this.SendQuery(new QueryAudioEditAudioClipLength());
+    }
+    public void RemoveTime(float Speed)
+    {
+        this.SendCommand(
+            new SetEditAudioThisTimeCommand(
+                this.SendQuery(
+                    new QueryAudioEditAudioClipThisTime()) - 0.01f * Speed));
+        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100) / this.SendQuery(new QueryAudioEditAudioClipLength());
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         TimeHand.position = eventData.position;
-        this.SendCommand(new SetEditAudioThisTimeCommand((TimeHand.anchoredPosition.x) /100));
-        this.SendEvent<OnUpdateThisTime>();
+        this.SendCommand(new SetEditAudioThisTimeCommand((TimeHand.anchoredPosition.x) / 100));
     }
     public IArchitecture GetArchitecture()
     {
         return GameBody.Interface;
     }
 
-    
+
 }

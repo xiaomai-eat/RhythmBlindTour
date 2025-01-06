@@ -1,4 +1,5 @@
-﻿using Qf.Models.AudioEdit;
+﻿using Qf.Events;
+using Qf.Models.AudioEdit;
 using QFramework;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace Qf.Commands.AudioEdit
                     audioEditModel.ThisTime = 0;
                 }
             }
-                
+            this.SendEvent<OnUpdateThisTime>();
         }
     }
 }

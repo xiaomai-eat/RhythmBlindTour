@@ -61,7 +61,6 @@ namespace Qf.Managers
         void UpdateAll()
         {
             this.SendCommand(new SetEditAudioThisTimeCommand(audioSource.time));
-            this.SendEvent<OnUpdateThisTime>();
         }
         void PlayMode()
         {

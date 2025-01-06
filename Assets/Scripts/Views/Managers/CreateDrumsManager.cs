@@ -5,22 +5,11 @@ using UnityEngine;
 
 public class CreateDrumsManager:ManagerBase
 {
-    public void Test1()
-    {
-        CreateDrums(TheTypeOfOperation.SwipeUp, new Vector3(0, 0, 0));
-    }
-    public void Test2()
-    {
-        CreateDrums(TheTypeOfOperation.SwipeDown, new Vector3(0, 0, 0));
-    }
-    public void Test3()
-    {
-        CreateDrums(TheTypeOfOperation.SwipeLeft, new Vector3(0, 0, 0));
-    }
-    public void Test4()
-    {
-        CreateDrums(TheTypeOfOperation.SwipeRight, new Vector3(0, 0, 0));
-    }
+    /// <summary>
+    /// 添加鼓点实体
+    /// </summary>
+    /// <param name="operation"></param>
+    /// <param name="vector3"></param>
     public void CreateDrums(TheTypeOfOperation operation,Vector3 vector3)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
