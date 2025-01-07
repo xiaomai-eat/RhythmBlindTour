@@ -20,8 +20,8 @@ public class UIWaveformDiagram : MonoBehaviour, IController
     void Init()
     {
         AudioClip music = this.GetModel<AudioEditModel>().EditAudioClip;
-        Debug.Log("初始化音乐波形图名称: "+music.name);
         if (music == null) { Debug.Log("没有待处理的音频初始化"); return; }
+        Debug.Log("初始化音乐波形图名称: " + music.name);
         Debug.Log(music.length);
         int musicwaveformwidth = Mathf.CeilToInt(music.length * 100);// 波形宽度
         int dataSum = music.frequency / 100; //数据容量

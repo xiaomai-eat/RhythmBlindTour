@@ -23,7 +23,6 @@ public class UIWindowBase : MonoBehaviour,IController
     /// <param name="showData"></param>
     public virtual void OnShow(IUIData showData)
     {
-
     }
     /// <summary>
     /// 隐藏UI的时候执行一次
@@ -50,7 +49,7 @@ public class UIWindowBase : MonoBehaviour,IController
         OnHide();
         if (destroy)
             OnDestroyClose();
-        UIManager.Instance.Close(Type);
+        UIManager.instance.Close(Type);
     }
 
     public virtual void HideYes()

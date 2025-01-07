@@ -20,7 +20,7 @@ namespace Qf.Systems
         protected override void OnInit()
         {
             InputInit();
-            Managers.Managers.Instance.AddUpdate(() => Pc());
+            Managers.Managers.instance.AddUpdate(() => Pc());
         }
         void InputInit()
         {

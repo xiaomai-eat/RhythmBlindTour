@@ -12,7 +12,8 @@ namespace Qf.Managers {
         Action _UpDate;
         Action _FixedUpDate;
         Action _LateUpDate;
-        void Awake()
+
+        protected override void OnAwake()
         {
             GetArchitecture();
 
@@ -21,14 +22,8 @@ namespace Qf.Managers {
                 manager.Init();
             }
 
-            OnAwke();
-        }
-
-        void OnAwke()
-        {
             this.SendCommand(new SetEditAudioCommand(audioClip));
         }
-
         void Update() => _UpDate?.Invoke();
 
         void FixedUpdate() => _FixedUpDate?.Invoke();

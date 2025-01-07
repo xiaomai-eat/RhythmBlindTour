@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class UIDrums : MonoBehaviour,IPointerClickHandler
 {
-    Dictionary<float, DrumsLoadData> _data = new();
     [SerializeField]
     Image image;
 

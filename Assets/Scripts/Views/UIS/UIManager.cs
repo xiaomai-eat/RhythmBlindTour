@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using QFramework;
 
 public interface IUIData
 {
@@ -31,7 +30,11 @@ public class UIManager : Singleton<UIManager>
     public UIManager()
     {
         //UIResources[typeof(UITest)] = new UIElement { AssetName = PathConfig.UIPath + "UITest" };
-
+        //RegisterUI<UITest>(PathConfig.UIPath +"UITest");
+    }
+    void RegisterUI<T>(string UIPath)where T : UIWindowBase
+    {
+        UIResources[typeof(T)] = new UIElement { AssetName = UIPath };
     }
     public T Show<T>(IUIData data) where T : UIWindowBase
     {
