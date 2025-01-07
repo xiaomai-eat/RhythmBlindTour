@@ -45,7 +45,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
         TimeHand.anchoredPosition = new Vector2(newTime * 100, 0);
         ShowTime.text = newTime.ToString("0.00");
     }
-    int mode = 0;
+    int mode = 0;//这里的模式指:时间轴的添加或删除模式
     float Speed;
     float PressTime;
     private void Update()

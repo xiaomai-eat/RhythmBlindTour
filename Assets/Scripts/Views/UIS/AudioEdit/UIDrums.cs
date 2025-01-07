@@ -15,11 +15,13 @@ public class UIDrums : MonoBehaviour,IPointerClickHandler
         ShowData();
     }
 
-
     public void SetColor(Color color)
     {
         image.color = color;
     }
+    /// <summary>
+    /// 这里打开单独鼓点编辑器
+    /// </summary>
     public void ShowData()
     {
         Debug.Log("时间轴中的数据");
