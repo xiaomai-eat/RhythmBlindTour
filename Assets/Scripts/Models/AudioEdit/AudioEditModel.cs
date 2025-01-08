@@ -12,7 +12,7 @@ namespace Qf.Models.AudioEdit
         public AudioClip EditAudioClip;//编辑的音频
         public float ThisTime;//当前时间
         public Dictionary<float, DrumsLoadData> TimeLineData = new();//时间线数据(存储的为时间轴对应鼓点数据)
-        //public DrumsLoadData GetThisTimeLoadData()
+        //public DrumsLoadData GetThisTimeLoadData()//获取当前时间的数据
         //{
         //    if (!TimeLineData.ContainsKey(ThisTime))
         //    {
@@ -20,7 +20,7 @@ namespace Qf.Models.AudioEdit
         //    }
         //    return TimeLineData[ThisTime];
         //}
-        //public bool EqueryThisTimeLoadData()
+        //public bool EqueryThisTimeLoadData()//当前时间是否有数据
         //{
         //    if (!TimeLineData.ContainsKey(ThisTime))
         //    {
