@@ -1,10 +1,11 @@
 using QFramework;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Qf.Managers;
 namespace Qf.Systems
 {
+    /// <summary>
+    /// 输入系统(通过统一的接口获取输入)
+    /// </summary>
     public class InputSystems : AbstractSystem
     {
         public static bool Quit { get; protected set; }
@@ -16,7 +17,7 @@ namespace Qf.Systems
         public static bool Click { get; protected set; }
         public static float Horizontal { get; protected set; }
         public static float Vertical { get; protected set; }
-        static Dictionary<string, List<KeyCode>> keyValuePairs = new();
+        static Dictionary<string, List<KeyCode>> keyValuePairs = new();//用于切换触发事件的物理按键
         protected override void OnInit()
         {
             InputInit();

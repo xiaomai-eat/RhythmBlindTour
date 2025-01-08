@@ -1,13 +1,11 @@
 ﻿using Qf.Models.AudioEdit;
 using QFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Qf.Querys.AudioEdit
 {
+    /// <summary>
+    /// 查询音频编辑器音频当前的时间(播放时间<秒>)
+    /// </summary>
     public class QueryAudioEditAudioClipThisTime : AbstractQuery<float>
     {
         AudioEditModel audioEditModel;

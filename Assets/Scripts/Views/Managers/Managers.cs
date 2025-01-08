@@ -1,3 +1,4 @@
+using Qf.Commands.AudioEdit;
 using QFramework;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Qf.Managers {
                 manager.Init();
             }
 
-            this.SendCommand(new SetEditAudioCommand(audioClip));
+            this.SendCommand(new SetEditAudioAudioCommand(audioClip));
         }
         void Update() => _UpDate?.Invoke();
 

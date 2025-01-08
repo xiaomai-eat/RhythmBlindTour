@@ -14,7 +14,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     [SerializeField]
     RectTransform TimeHand;
     [SerializeField]
-    TMP_Text ShowTime;
+    TMP_Text[] ShowTimes;
     [SerializeField]
     ScrollRect ScrollRect;
     public Vector2 TimeHandPos
@@ -43,7 +43,10 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     {
         float newTime = this.SendQuery(new QueryAudioEditAudioClipThisTime());
         TimeHand.anchoredPosition = new Vector2(newTime * 100, 0);
-        ShowTime.text = newTime.ToString("0.00");
+        foreach (var t in ShowTimes)
+        {
+            t.text = newTime.ToString("0.00");
+        }
     }
     int mode = 0;//这里的模式指:时间轴的添加或删除模式
     float Speed;

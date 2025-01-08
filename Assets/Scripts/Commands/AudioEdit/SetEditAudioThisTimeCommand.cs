@@ -1,17 +1,19 @@
 ﻿using Qf.Events;
 using Qf.Models.AudioEdit;
 using QFramework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Qf.Commands.AudioEdit
 {
+    /// <summary>
+    /// 设置编辑器当前播放时间命令
+    /// </summary>
     public class SetEditAudioThisTimeCommand : AbstractCommand
     {
         float value;
+        /// <summary>
+        /// 设置编辑器当前播放时间命令
+        /// </summary>
+        /// <param name="time">时间</param>
         public SetEditAudioThisTimeCommand(float time)
         {
             value = time;

@@ -1,10 +1,10 @@
 using Qf.Models.AudioEdit;
 using QFramework;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 namespace Qf.Querys.AudioEdit
 {
+    /// <summary>
+    /// 获取当前音频编辑器音频长度
+    /// </summary>
     public class QueryAudioEditAudioClipLength : AbstractQuery<float>
     {
         AudioEditModel audioEditModel;

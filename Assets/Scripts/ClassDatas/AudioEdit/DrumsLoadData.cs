@@ -9,7 +9,7 @@ namespace Qf.ClassDatas.AudioEdit
 {
     public class DrumsLoadData
     {
-        public List<MusicData> Music = new();
-        public List<DrwmsData> InputMode = new();
+        public MusicData MusicData = new();
+        public DrwmsData DrwmsData = new();
     }
 }
