@@ -118,7 +118,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     public void AddTime(float Speed)
     {
         this.SendCommand(
-            new SetEditAudioThisTimeCommand(
+            new SetAudioEditThisTimeCommand(
                 this.SendQuery(
                     new QueryAudioEditAudioClipThisTime()) + 0.01f * Speed));
         ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100)/this.SendQuery(new QueryAudioEditAudioClipLength());
@@ -126,7 +126,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     public void RemoveTime(float Speed)
     {
         this.SendCommand(
-            new SetEditAudioThisTimeCommand(
+            new SetAudioEditThisTimeCommand(
                 this.SendQuery(
                     new QueryAudioEditAudioClipThisTime()) - 0.01f * Speed));
         ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100) / this.SendQuery(new QueryAudioEditAudioClipLength());
@@ -135,7 +135,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         TimeHand.position = eventData.position;
-        this.SendCommand(new SetEditAudioThisTimeCommand((TimeHand.anchoredPosition.x) / 100));
+        this.SendCommand(new SetAudioEditThisTimeCommand((TimeHand.anchoredPosition.x) / 100));
     }
     public IArchitecture GetArchitecture()
     {

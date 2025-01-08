@@ -1,3 +1,4 @@
+using Qf.Commands.AudioEdit;
 using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using QFramework;
@@ -38,8 +39,8 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
             DrumsUI[i].sizeDelta = new Vector2(SongTime*100,80);
         }
 
-        //初始话鼓点数据
-        //没写
+        //初始化鼓点数据
+
     }
     void Start()
     {

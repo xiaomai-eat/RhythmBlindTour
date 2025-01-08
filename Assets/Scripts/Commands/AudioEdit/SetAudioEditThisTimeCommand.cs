@@ -7,14 +7,14 @@ namespace Qf.Commands.AudioEdit
     /// <summary>
     /// 设置编辑器当前播放时间命令
     /// </summary>
-    public class SetEditAudioThisTimeCommand : AbstractCommand
+    public class SetAudioEditThisTimeCommand : AbstractCommand
     {
         float value;
         /// <summary>
         /// 设置编辑器当前播放时间命令
         /// </summary>
         /// <param name="time">时间</param>
-        public SetEditAudioThisTimeCommand(float time)
+        public SetAudioEditThisTimeCommand(float time)
         {
             value = time;
         }

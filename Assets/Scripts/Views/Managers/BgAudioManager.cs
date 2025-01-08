@@ -39,17 +39,17 @@ namespace Qf.Managers
                 PlayMode();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
-            this.RegisterEvent<ExitPlayMode>(v =>
-            {
-                Debug.Log("退出游玩模式");
-                ExitPlayMode();
-            }).UnRegisterWhenGameObjectDestroyed(gameObject);
-
             this.RegisterEvent<OnRecordingMode>(v =>
             {
                 Debug.Log("录制模式");
                 Mode = 2;
                 PlayMode();
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+
+            this.RegisterEvent<ExitPlayMode>(v =>
+            {
+                Debug.Log("退出游玩模式");
+                ExitPlayMode();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<ExitRecordingMode>(v =>
@@ -60,7 +60,7 @@ namespace Qf.Managers
         }
         void UpdateAll()
         {
-            this.SendCommand(new SetEditAudioThisTimeCommand(audioSource.time));
+            this.SendCommand(new SetAudioEditThisTimeCommand(audioSource.time));
         }
         void PlayMode()
         {

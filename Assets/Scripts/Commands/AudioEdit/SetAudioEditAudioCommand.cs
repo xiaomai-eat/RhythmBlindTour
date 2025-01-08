@@ -6,14 +6,14 @@ namespace Qf.Commands.AudioEdit
     /// <summary>
     ///…Ë÷√±‡º≠∆˜“Ù∆µ√¸¡Ó
     /// </summary>
-    public class SetEditAudioAudioCommand : AbstractCommand
+    public class SetAudioEditAudioCommand : AbstractCommand
     {
         AudioClip clip;
         /// <summary>
         /// …Ë÷√±‡º≠∆˜“Ù∆µ√¸¡Ó
         /// </summary>
         /// <param name="audioClip">“Ù∆µ</param>
-        public SetEditAudioAudioCommand(AudioClip audioClip)
+        public SetAudioEditAudioCommand(AudioClip audioClip)
         {
             clip = audioClip;
         }

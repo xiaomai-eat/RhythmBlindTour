@@ -11,7 +11,7 @@ namespace Qf.Commands.AudioEdit
     /// <summary>
     /// 添加编辑器时间轴上的数据命令
     /// </summary>
-    public class AddEditAudioTimeLineDataCommand : AbstractCommand
+    public class AddAudioEditTimeLineDataCommand : AbstractCommand
     {
         float time;
         DrumsLoadData value;
@@ -21,7 +21,7 @@ namespace Qf.Commands.AudioEdit
         /// </summary>
         /// <param name="time">时间</param>
         /// <param name="value">值</param>
-        public AddEditAudioTimeLineDataCommand(float time, DrumsLoadData value)
+        public AddAudioEditTimeLineDataCommand(float time, DrumsLoadData value)
         {
             this.time = time;
             this.value = value;
