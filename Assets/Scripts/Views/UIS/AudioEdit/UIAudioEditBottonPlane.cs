@@ -1,3 +1,4 @@
+using Qf.Events;
 using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using QFramework;
@@ -12,25 +13,27 @@ public class UIAudioEditBottonPlane : MonoBehaviour ,IController
     Image buttonImage; //按钮图片
     [SerializeField]
     RectTransform slideRegin; //滑动区域
-
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
+    int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
     void Start()
     {
         Init();
+        this.RegisterEvent<MainAudioChangeValue>(v=>Init()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
     void Init()
     {
         float SongTime = this.SendQuery(new QueryAudioEditAudioClipLength());
-        slideRegin.sizeDelta = new Vector2(SongTime * 100, slideRegin.sizeDelta.y);
+        slideRegin.sizeDelta = new Vector2(SongTime * _PixelUnitsPerSecond, slideRegin.sizeDelta.y);
     }
     public void ToGglebottonPlaneShow()
     {
-        if(bottonPlane.anchoredPosition == new Vector2(0, -400))
+        if(bottonPlane.anchoredPosition == new Vector2(0, -_EditHeight))
         {
             bottonPlane.anchoredPosition = new Vector2(0,0);
         }
         else
         {
-            bottonPlane.anchoredPosition = new Vector2(0,-400);
+            bottonPlane.anchoredPosition = new Vector2(0,-_EditHeight);
         }
     }
     void Update()

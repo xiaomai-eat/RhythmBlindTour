@@ -1,3 +1,4 @@
+using Qf.Events;
 using Qf.Models.AudioEdit;
 using QFramework;
 using UnityEngine;
@@ -20,6 +21,7 @@ namespace Qf.Commands.AudioEdit
         protected override void OnExecute()
         {
             this.GetModel<AudioEditModel>().EditAudioClip = clip;
+            this.SendEvent<MainAudioChangeValue>();
         }
     }
 

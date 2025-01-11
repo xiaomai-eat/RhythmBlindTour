@@ -64,12 +64,16 @@ namespace Qf.Managers
         }
         void PlayMode()
         {
-            audioSource.time = editModel.ThisTime;
-            audioSource.clip = editModel.EditAudioClip;
+            UpdateData();
         }
         void ExitPlayMode()
         {
             audioSource.Pause();
+        }
+        void UpdateData()
+        {
+            audioSource.time = editModel.ThisTime;
+            audioSource.clip = editModel.EditAudioClip;
         }
         private void Update()
         {
@@ -89,6 +93,7 @@ namespace Qf.Managers
         void Start()
         {
             Init();
+            this.RegisterEvent<MainAudioChangeValue>(v => UpdateData()).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
         public IArchitecture GetArchitecture()
         {

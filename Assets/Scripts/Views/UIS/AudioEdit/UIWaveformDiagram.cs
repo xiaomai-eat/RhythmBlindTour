@@ -1,3 +1,4 @@
+using Qf.Events;
 using Qf.Models.AudioEdit;
 using QFramework;
 using System.Collections;
@@ -14,17 +15,16 @@ public class UIWaveformDiagram : MonoBehaviour, IController
     Color waveFormDiagramColor = Color.yellow;//波形图颜色
     [SerializeField]
     Color notWaveFormDiagramColor = Color.clear;//非波形图区域颜色
-
-
-
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
+    int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
     void Init()
     {
         AudioClip music = this.GetModel<AudioEditModel>().EditAudioClip;
         if (music == null) { Debug.Log("没有待处理的音频初始化"); return; }
         Debug.Log("初始化音乐波形图名称: " + music.name);
         Debug.Log(music.length);
-        int musicwaveformwidth = Mathf.CeilToInt(music.length * 100);// 波形宽度
-        int dataSum = music.frequency / 100; //数据容量
+        int musicwaveformwidth = Mathf.CeilToInt(music.length * _PixelUnitsPerSecond);// 波形宽度
+        int dataSum = music.frequency / _PixelUnitsPerSecond; //数据容量
         float[] samplingData = new float[music.samples * music.channels];//采样数据
         music.GetData(samplingData, 0);
         float[] waveformValue = new float[samplingData.Length / dataSum];
@@ -41,8 +41,8 @@ public class UIWaveformDiagram : MonoBehaviour, IController
                 waveformMax = waveformValue[i];
             }
         }
-        Texture2D waveformTexture = new Texture2D(musicwaveformwidth, 400);
-        Color[] Colors = new Color[musicwaveformwidth * 400];
+        Texture2D waveformTexture = new Texture2D(musicwaveformwidth, _EditHeight);
+        Color[] Colors = new Color[musicwaveformwidth * _EditHeight];
         for (int i = 0; i < Colors.Length; ++i)
         {
             Colors[i] = notWaveFormDiagramColor;
@@ -50,7 +50,7 @@ public class UIWaveformDiagram : MonoBehaviour, IController
         waveformTexture.SetPixels(Colors, 0);
         float hscaled = (float)musicwaveformwidth / (float)waveformValue.Length;
         float vscaled = 1;
-        int waveformhalfhight = (int)(400 / 2.0f);
+        int waveformhalfhight = (int)(_EditHeight / 2.0f);
         if (waveformMax > waveformhalfhight)
         {
             vscaled = waveformhalfhight / waveformMax;
@@ -72,6 +72,7 @@ public class UIWaveformDiagram : MonoBehaviour, IController
     void Start()
     {
         Init();
+        this.RegisterEvent<MainAudioChangeValue>(v =>Init()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
     void Update()
     {

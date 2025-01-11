@@ -23,6 +23,7 @@ namespace Qf.Commands.AudioEdit
             AudioEditModel audioEditModel = this.GetModel<AudioEditModel>();
             if (audioEditModel != null)
             {
+                if (audioEditModel.EditAudioClip == null) return;
                 audioEditModel.ThisTime = value;
                 if(audioEditModel.ThisTime > audioEditModel.EditAudioClip.length)
                 {

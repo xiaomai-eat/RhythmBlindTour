@@ -32,4 +32,8 @@ namespace Qf.Events
     /// 更新鼓点UI
     /// </summary>
     public struct OnUpdateAudioEditDrumsUI { };
+    /// <summary>
+    /// 主音频改变
+    /// </summary>
+    public struct MainAudioChangeValue { };
 }

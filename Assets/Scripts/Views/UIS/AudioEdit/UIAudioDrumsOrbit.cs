@@ -1,4 +1,5 @@
 using Qf.Commands.AudioEdit;
+using Qf.Events;
 using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using QFramework;
@@ -12,6 +13,8 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     GameObject DrumsProfabs;//鼓点预制体
     [SerializeField]
     RectTransform[] DrumsUI;
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
+    int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
     IArchitecture IBelongToArchitecture.GetArchitecture()
     {
         return GameBody.Interface;
@@ -32,19 +35,24 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     }
     void Init()
     {
-        //初始化轨道长度
-        float SongTime = this.SendQuery(new QueryAudioEditAudioClipLength());
-        for (int i = 0; i < DrumsUI.Length; i++)
-        {
-            DrumsUI[i].sizeDelta = new Vector2(SongTime*100,80);
-        }
+        StartLength();
 
         //初始化鼓点数据
 
     }
+    void StartLength()
+    {
+        //初始化轨道长度
+        float SongTime = this.SendQuery(new QueryAudioEditAudioClipLength());
+        for (int i = 0; i < DrumsUI.Length; i++)
+        {
+            DrumsUI[i].sizeDelta = new Vector2(SongTime * _PixelUnitsPerSecond, _EditHeight/ DrumsUI.Length);
+        }
+    }
     void Start()
     {
         Init();
+        this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
 
 }

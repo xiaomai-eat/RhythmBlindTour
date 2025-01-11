@@ -17,6 +17,8 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     TMP_Text[] ShowTimes;
     [SerializeField]
     ScrollRect ScrollRect;
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//Ã¿ÃëÏñËØµ¥Î»
+    int _EditHeight = AudioEditConfig.EditHeight;//±à¼­Æ÷¿É±à¼­·¶Î§¸ß¶È
     public Vector2 TimeHandPos
     {
         get
@@ -34,6 +36,10 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
         {
             UpdateThisTime();
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
+        this.RegisterEvent<MainAudioChangeValue>(v =>
+        {
+            UpdateThisTime();
+        }).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
     private void OnEnable()
     {
@@ -42,7 +48,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
     void UpdateThisTime()
     {
         float newTime = this.SendQuery(new QueryAudioEditAudioClipThisTime());
-        TimeHand.anchoredPosition = new Vector2(newTime * 100, 0);
+        TimeHand.anchoredPosition = new Vector2(newTime * _PixelUnitsPerSecond, 0);
         foreach (var t in ShowTimes)
         {
             t.text = newTime.ToString("0.00");
@@ -121,7 +127,7 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
             new SetAudioEditThisTimeCommand(
                 this.SendQuery(
                     new QueryAudioEditAudioClipThisTime()) + 0.01f * Speed));
-        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100)/this.SendQuery(new QueryAudioEditAudioClipLength());
+        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / _PixelUnitsPerSecond)/this.SendQuery(new QueryAudioEditAudioClipLength());
     }
     public void RemoveTime(float Speed)
     {
@@ -129,13 +135,13 @@ public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
             new SetAudioEditThisTimeCommand(
                 this.SendQuery(
                     new QueryAudioEditAudioClipThisTime()) - 0.01f * Speed));
-        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / 100) / this.SendQuery(new QueryAudioEditAudioClipLength());
+        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / _PixelUnitsPerSecond) / this.SendQuery(new QueryAudioEditAudioClipLength());
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         TimeHand.position = eventData.position;
-        this.SendCommand(new SetAudioEditThisTimeCommand((TimeHand.anchoredPosition.x) / 100));
+        this.SendCommand(new SetAudioEditThisTimeCommand((TimeHand.anchoredPosition.x) / _PixelUnitsPerSecond));
     }
     public IArchitecture GetArchitecture()
     {
