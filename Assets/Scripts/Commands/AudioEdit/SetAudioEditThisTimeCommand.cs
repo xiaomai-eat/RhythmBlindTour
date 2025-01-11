@@ -24,14 +24,18 @@ namespace Qf.Commands.AudioEdit
             if (audioEditModel != null)
             {
                 if (audioEditModel.EditAudioClip == null) return;
-                audioEditModel.ThisTime = value;
-                if(audioEditModel.ThisTime > audioEditModel.EditAudioClip.length)
+                
+                if(value > audioEditModel.EditAudioClip.length)
                 {
                     audioEditModel.ThisTime = audioEditModel.EditAudioClip.length;
                 }
-                else if(audioEditModel.ThisTime<=0)
+                else if(value<0)
                 {
                     audioEditModel.ThisTime = 0;
+                }
+                else
+                {
+                    audioEditModel.ThisTime = value;
                 }
             }
             this.SendEvent<OnUpdateThisTime>();
