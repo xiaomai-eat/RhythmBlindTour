@@ -71,7 +71,6 @@ public class UIWaveformDiagram : MonoBehaviour, IController
     }
     void Start()
     {
-        Init();
         this.RegisterEvent<MainAudioChangeValue>(v =>Init()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
     void Update()

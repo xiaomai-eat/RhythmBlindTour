@@ -2994,7 +2994,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 952955410}
   m_Direction: 2
   m_Value: 0
-  m_Size: 0.9999631
+  m_Size: 0.99992746
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3071,7 +3071,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0.000040894876}
+  m_AnchoredPosition: {x: 0, y: 0.000030317084}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1049386751
@@ -4651,7 +4651,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 261104907}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.99062985
+  m_Size: 0.99060154
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -6053,6 +6053,7 @@ GameObject:
   - component: {fileID: 1784340041}
   - component: {fileID: 1784340043}
   - component: {fileID: 1784340042}
+  - component: {fileID: 1784340044}
   m_Layer: 5
   m_Name: "\u5DE5\u51774"
   m_TagString: Untagged
@@ -6117,6 +6118,35 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1784340040}
   m_CullTransparentMesh: 1
+--- !u!114 &1784340044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1784340040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 2
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1988331475}
+          m_TargetAssemblyTypeName: Qf.Managers.Managers, Assembly-CSharp
+          m_MethodName: Test
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!1 &1793579406
 GameObject:
   m_ObjectHideFlags: 0
@@ -6703,6 +6733,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4180325075076275465, guid: 175487d71a5623f4c9b62fdc94f71dd7, type: 3}
   m_PrefabInstance: {fileID: 1161429995}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1988331475 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7427002370446069019, guid: 175487d71a5623f4c9b62fdc94f71dd7, type: 3}
+  m_PrefabInstance: {fileID: 1161429995}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e93ec5441343e546affa2956fe38af9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2025846886
 GameObject:
   m_ObjectHideFlags: 0

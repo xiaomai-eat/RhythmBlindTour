@@ -21,6 +21,7 @@ namespace Qf.Commands.AudioEdit
         protected override void OnExecute()
         {
             this.GetModel<AudioEditModel>().EditAudioClip = clip;
+            this.SendCommand(new SetAudioEditThisTimeCommand(0));
             this.SendEvent<MainAudioChangeValue>();
         }
     }
