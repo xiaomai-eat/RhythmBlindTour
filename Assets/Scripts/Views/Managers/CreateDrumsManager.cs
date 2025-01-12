@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
-/// 该类是用于管理鼓点实体的
+/// 该类是用于管理鼓点实体的(可通过链式方法去设置鼓点数据)
 /// </summary>
 public class CreateDrumsManager : ManagerBase
 {
