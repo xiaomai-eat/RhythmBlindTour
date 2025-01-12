@@ -13,6 +13,8 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     GameObject DrumsProfabs;//鼓点预制体
     [SerializeField]
     RectTransform[] DrumsUI;
+    [SerializeField]
+    List<GameObject> DrumsUIInDrums = new ();
     int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
     int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
     IArchitecture IBelongToArchitecture.GetArchitecture()
@@ -42,6 +44,11 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     void UpDateDrwmsUI()
     {
         //初始化鼓点数据
+    }
+    void UpDateAllDrwmsUI()
+    {
+        //清除鼓点UI
+        //通过字典重新实例化所有鼓点位置
     }
     void StartLength()
     {

@@ -6,10 +6,16 @@ public class InputMode : MonoBehaviour
 {
     [SerializeField]
     TheTypeOfOperation operation;
-    [SerializeField]
     DrwmsData drwmsData = new();
+    public DrwmsData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     [SerializeField]
     float TimeOfExistence;//鼓点存在时间
+    AudioClip _PreAdventClip;//来临前播放的音频
+    public AudioClip PreAdventClip { get { return _PreAdventClip; } set { _PreAdventClip = value; } }
+    AudioClip _SucceedClip;//成功时的音频
+    public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
+    AudioClip _FailClip;//失败时的音频
+    public AudioClip FailClip { get { return _FailClip; }  set { _FailClip = value; } }
     //[SerializeField]
     //bool isPlay;//是否被点击(用于处理同时出现的情况目前来说用不着)
     public SpriteRenderer SpriteRenderer;
@@ -19,6 +25,7 @@ public class InputMode : MonoBehaviour
     }
     void Init()
     {
+
     }
     void Start()
     {
