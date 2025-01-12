@@ -36,9 +36,12 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     void Init()
     {
         StartLength();
-
+        this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v => UpDateDrwmsUI()).UnRegisterWhenGameObjectDestroyed(gameObject);
+        this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
+    }
+    void UpDateDrwmsUI()
+    {
         //初始化鼓点数据
-
     }
     void StartLength()
     {
@@ -52,7 +55,6 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     void Start()
     {
         Init();
-        this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
 
 }
