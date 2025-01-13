@@ -24,16 +24,10 @@ public class UIAudioDrumsOrbit : MonoBehaviour,IController
     public void AddDrwms()
     {
         Debug.Log("生成鼓点");
-        //判断当前位置是否已经存在鼓点
-        //生成鼓点
-        //设置鼓点位置
     }
     public void RemoveDrwms()
     {
         Debug.Log("删除鼓点");
-        //判断当前位置是否已经存在鼓点
-        //当前鼓点
-        //清除鼓点
     }
     void Init()
     {

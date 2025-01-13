@@ -47,13 +47,13 @@ public class CreateDrumsManager : ManagerBase
         {
             get
             {
-                if(instance == null)
+                if (instance == null)
                     instance = new CreateSetClass();
                 return instance;
             }
             set
             {
-                if(value != null)
+                if (value != null)
                     instance = value;
             }
         }
@@ -70,23 +70,48 @@ public class CreateDrumsManager : ManagerBase
         /// </summary>
         public void SetSuccessSounds(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
-            _Mode.SuccessClip = Clip;
+            if (Clip != null)
+                _Mode.SuccessClip = Clip;
+            _Mode.DrwmsData.SucceedAudioClipOffsetTime = DelayTime;
+            SetCpVector(channelPosition);
         }
         /// <summary>
         /// 设置来临前音效(音效及延迟时间)
         /// </summary>
         public void SetPreAdventSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
-            _Mode.PreAdventClip = Clip;
+            if (Clip != null)
+                _Mode.PreAdventClip = Clip;
+            _Mode.DrwmsData.PreAdventAudioClipOffsetTime = DelayTime;
+            SetCpVector(channelPosition);
         }
         /// <summary>
         /// 设置失败音效(音效及延迟时间)
         /// </summary>
         public void SetFailureSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
-            _Mode.FailClip = Clip;
+            if (Clip != null)
+                _Mode.FailClip = Clip;
+            _Mode.DrwmsData.FailAudioClipOffsetTime = DelayTime;
+            SetCpVector(channelPosition);
         }
-        
+        void SetCpVector(ChannelPosition channelPosition)
+        {
+            switch (channelPosition)
+            {
+                case ChannelPosition.FullChannel:
+                    _AudioSource.panStereo = 0;
+                    break;
+                case ChannelPosition.LeftChannel:
+                    _AudioSource.panStereo = -1;
+                    break;
+                case ChannelPosition.RightChannel:
+                    _AudioSource.panStereo = 1;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public enum ChannelPosition //声道位置

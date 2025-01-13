@@ -102,6 +102,9 @@ public class InputMode : MonoBehaviour
         operation = theTypeOfOperation;
     }
 }
+/// <summary>
+/// ½»»¥²Ù×÷
+/// </summary>
 public enum TheTypeOfOperation
 {
     SwipeUp,
