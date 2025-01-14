@@ -37,8 +37,7 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
-            float newTime = this.SendQuery(new QueryAudioEditAudioClipThisTime());
-            _TimeShow.text = newTime.ToString("0.00");
+            _TimeShow.text = v.ThisTime.ToString("0.00");
         });
         this.RegisterEvent<MainAudioChangeValue>(v =>
         {

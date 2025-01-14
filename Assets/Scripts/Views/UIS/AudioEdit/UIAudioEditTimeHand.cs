@@ -34,7 +34,8 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     {
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
-            UpdateThisTime();
+            TimeHand.anchoredPosition = new Vector2(v.ThisTime * _PixelUnitsPerSecond, 0);
+            ShowTimes.text = v.ThisTime.ToString("0.00");
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<MainAudioChangeValue>(v =>
         {

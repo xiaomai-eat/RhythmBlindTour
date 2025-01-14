@@ -23,9 +23,7 @@ namespace Qf.Commands.AudioEdit
             this.GetModel<AudioEditModel>().EditAudioClip = clip;
             this.SendCommand(new SetAudioEditThisTimeCommand(0));
             this.SendCommand(new RemoveAudioEditTimeLineDataCommand(-1));
-            MainAudioChangeValue ls = new MainAudioChangeValue();
-            ls.Name = clip.name;
-            this.SendEvent(ls);
+            this.SendEvent(new MainAudioChangeValue() { Name = clip.name });
         }
     }
 

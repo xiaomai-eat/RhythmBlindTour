@@ -15,6 +15,7 @@ namespace Qf.Models.AudioEdit
         public AudioClip EditAudioClip;//编辑的音频
         public float ThisTime;//当前时间
         public Dictionary<float,List<DrumsLoadData>> TimeLineData = new();//时间线数据(存储的为时间轴对应鼓点数据)
+        public int BPM = 60;
         protected override void OnInit()
         {
             

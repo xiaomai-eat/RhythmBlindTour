@@ -27,7 +27,9 @@ namespace Qf.Events
     /// <summary>
     /// 更新当前时间UI
     /// </summary>
-    public struct OnUpdateThisTime { };
+    public struct OnUpdateThisTime {
+        public float ThisTime;
+    };
     /// <summary>
     /// 更新鼓点UI
     /// </summary>
