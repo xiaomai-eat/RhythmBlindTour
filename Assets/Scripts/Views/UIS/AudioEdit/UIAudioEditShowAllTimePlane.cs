@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using UnityEngine;
 public class UIAudioEditShowAllTimePlane : MonoBehaviour, IController
 {
-
     public IArchitecture GetArchitecture()
     {
         return GameBody.Interface;
