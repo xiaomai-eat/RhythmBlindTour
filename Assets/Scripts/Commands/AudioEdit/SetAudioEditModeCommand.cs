@@ -19,7 +19,6 @@ namespace Qf.Commands.AudioEdit
             AudioEditModel = this.GetModel<AudioEditModel>();
             LastModeData = AudioEditModel.Mode;
             AudioEditModel.Mode = CurrentModeData;
-            if (LastModeData == CurrentModeData) return;
             switch (LastModeData)
             {
                 case SystemModeData.EditMode:

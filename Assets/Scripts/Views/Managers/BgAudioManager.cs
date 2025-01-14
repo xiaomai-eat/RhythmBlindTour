@@ -6,6 +6,7 @@ using Qf.Models.AudioEdit;
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 namespace Qf.Managers
 {
@@ -14,11 +15,22 @@ namespace Qf.Managers
         [SerializeField]
         AudioSource audioSource;//“Ù∆µ‘¥
         AudioEditModel editModel;
-        [SerializeField]
         int Mode;
         private void Awake()
         {
                 
+        }
+        public void EnterPlayMode()
+        {
+            this.SendCommand(new SetAudioEditModeCommand(ClassDatas.AudioEdit.SystemModeData.PlayMode));
+        }
+        public void EnterEditMode()
+        {
+            this.SendCommand(new SetAudioEditModeCommand(ClassDatas.AudioEdit.SystemModeData.EditMode));
+        }
+        public void EnterRecordingMode()
+        {
+            this.SendCommand(new SetAudioEditModeCommand(ClassDatas.AudioEdit.SystemModeData.RecordingMode));
         }
         void Init()
         {

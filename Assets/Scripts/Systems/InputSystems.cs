@@ -58,6 +58,10 @@ namespace Qf.Systems
                 if (Input.GetKeyDown(keyValuePairs[keyName][0])){
                     return true;
                 }
+                else
+                {
+                    return false;
+                }
             }
             else
             {

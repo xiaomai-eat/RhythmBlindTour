@@ -31,6 +31,7 @@ public class UIManager : Singleton<UIManager>
     {
         //UIResources[typeof(UITest)] = new UIElement { AssetName = PathConfig.UIPath + "UITest" };
         //RegisterUI<UITest>(PathConfig.UIPath +"UITest");
+        RegisterUI<UIAudioEditShowAllTimePlane>(PathConfig.UIPath + "AudioEditUI/UIAllTimeDrumsShow");
     }
     void RegisterUI<T>(string UIPath)where T : UIWindowBase
     {

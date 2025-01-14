@@ -28,7 +28,12 @@ namespace Qf.Managers {
         public void Test()
         {
             this.SendCommand(new SetAudioEditAudioCommand(audioClip));//≤‚ ‘º”‘ÿ±‡º≠∆˜“Ù∆µ
+            
             //this.SendCommand(new SetAudioEditAudioCommand(FileLoader.LoadAudioClip(FileLoader.OpenFolderPanel())));
+        }
+        public void Test2()
+        {
+            UIManager.instance.Show<UIAudioEditShowAllTimePlane>(null);
         }
         void Update() => _UpDate?.Invoke();
 

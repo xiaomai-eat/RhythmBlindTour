@@ -1,8 +1,9 @@
 using Qf.ClassDatas.AudioEdit;
 using Qf.Systems;
+using QFramework;
 using UnityEngine;
 
-public class InputMode : MonoBehaviour
+public class InputMode : MonoBehaviour,IController
 {
     [SerializeField]
     TheTypeOfOperation operation;
@@ -10,10 +11,13 @@ public class InputMode : MonoBehaviour
     public DrwmsData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     [SerializeField]
     float TimeOfExistence;//鼓点存在时间
+    [SerializeField]
     AudioClip _PreAdventClip;//来临前播放的音频
     public AudioClip PreAdventClip { get { return _PreAdventClip; } set { _PreAdventClip = value; } }
+    [SerializeField]
     AudioClip _SucceedClip;//成功时的音频
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
+    [SerializeField]
     AudioClip _FailClip;//失败时的音频
     public AudioClip FailClip { get { return _FailClip; }  set { _FailClip = value; } }
     //[SerializeField]
@@ -33,11 +37,12 @@ public class InputMode : MonoBehaviour
     }
     void Update()
     {
-        TimeOfExistence += Time.deltaTime;
         if (drwmsData.DelayTheTriggerTime < TimeOfExistence)
         {
             InputRun();
+            return;
         }
+        TimeOfExistence += Time.deltaTime;
     }
     void InputRun()
     {
@@ -100,6 +105,11 @@ public class InputMode : MonoBehaviour
     public void SetOperation(TheTypeOfOperation theTypeOfOperation)
     {
         operation = theTypeOfOperation;
+    }
+
+    public IArchitecture GetArchitecture()
+    {
+        return GameBody.Interface;
     }
 }
 /// <summary>

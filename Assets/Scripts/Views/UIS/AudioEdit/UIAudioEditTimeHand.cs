@@ -14,7 +14,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     [SerializeField]
     RectTransform TimeHand;
     [SerializeField]
-    TMP_Text[] ShowTimes;
+    TMP_Text ShowTimes;
     [SerializeField]
     ScrollRect ScrollRect;
     int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
@@ -49,10 +49,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     {
         float newTime = this.SendQuery(new QueryAudioEditAudioClipThisTime());
         TimeHand.anchoredPosition = new Vector2(newTime * _PixelUnitsPerSecond, 0);
-        foreach (var t in ShowTimes)
-        {
-            t.text = newTime.ToString("0.00");
-        }
+        ShowTimes.text = newTime.ToString("0.00");
     }
     int mode = 0;//这里的模式指:时间轴的添加或删除模式
     float Speed;

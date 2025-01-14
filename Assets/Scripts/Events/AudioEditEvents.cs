@@ -35,5 +35,7 @@ namespace Qf.Events
     /// <summary>
     /// Ö÷ÒôÆµ¸Ä±ä
     /// </summary>
-    public struct MainAudioChangeValue { };
+    public struct MainAudioChangeValue {
+        public string Name;
+    };
 }
