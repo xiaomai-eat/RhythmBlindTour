@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UITimeHand : MonoBehaviour, IController, IPointerClickHandler
+public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHandler
 {
     [SerializeField]
     RectTransform TimeHand;

@@ -1,15 +1,9 @@
-﻿using Qf.ClassDatas.AudioEdit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Qf.ClassDatas.AudioEdit
+﻿namespace Qf.ClassDatas.AudioEdit
 {
     public class DrumsLoadData
     {
-        public MusicData MusicData = new();
-        public DrwmsData DrwmsData = new();
+        public string Name = "";
+        public MusicData MusicData = new();//这一时间段的主音乐的信息变化
+        public DrwmsData DrwmsData = new();//鼓点存放的数据
     }
 }

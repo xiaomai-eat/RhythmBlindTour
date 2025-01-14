@@ -6,8 +6,8 @@ using UnityEngine;
 namespace Qf.Managers {
     public class Managers : MonoSingleton<Managers>, IController
     {
-        //[SerializeField]
-        //AudioClip audioClip;//≤‚ ‘º”‘ÿ±‡º≠∆˜“Ù∆µ
+        [SerializeField]
+        AudioClip audioClip;//≤‚ ‘º”‘ÿ±‡º≠∆˜“Ù∆µ
         [SerializeField]
         List<ManagerBase> ManagerOrderOfExecution = new();//π‹¿Ì∆˜÷¥––À≥–Ú
         Action _UpDate;
@@ -23,11 +23,12 @@ namespace Qf.Managers {
                 manager.Init();
             }
             
-            //this.SendCommand(new SetAudioEditAudioCommand(audioClip));//≤‚ ‘º”‘ÿ±‡º≠∆˜“Ù∆µ
+            
         }
         public void Test()
         {
-            this.SendCommand(new SetAudioEditAudioCommand(FileLoader.LoadAudioClip(FileLoader.OpenFolderPanel())));
+            this.SendCommand(new SetAudioEditAudioCommand(audioClip));//≤‚ ‘º”‘ÿ±‡º≠∆˜“Ù∆µ
+            //this.SendCommand(new SetAudioEditAudioCommand(FileLoader.LoadAudioClip(FileLoader.OpenFolderPanel())));
         }
         void Update() => _UpDate?.Invoke();
 

@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Experimental.AI;
 using UnityEngine.UI;
 
-public class UIWaveformDiagram : MonoBehaviour, IController
+public class UIAudioEditWaveformDiagram : MonoBehaviour, IController
 {
     [SerializeField]
     Image musicWaveFormDiagramShow;//“Ù¿÷≤®–ŒÕºœ‘ æ

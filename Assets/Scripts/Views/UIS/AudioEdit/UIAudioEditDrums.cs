@@ -5,10 +5,12 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIDrums : MonoBehaviour,IPointerClickHandler
+public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
 {
     [SerializeField]
     Image image;
+    public float ThisTime;
+    public int Index;
 
     public void OnPointerClick(PointerEventData eventData)
     {
