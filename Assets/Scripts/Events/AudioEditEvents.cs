@@ -34,10 +34,15 @@ namespace Qf.Events
     /// 更新鼓点UI
     /// </summary>
     public struct OnUpdateAudioEditDrumsUI { };
+    public struct BPMChangeValue
+    {
+        public int BPM;
+    }
     /// <summary>
     /// 主音频改变
     /// </summary>
     public struct MainAudioChangeValue {
         public string Name;
+        public float Length;
     };
 }

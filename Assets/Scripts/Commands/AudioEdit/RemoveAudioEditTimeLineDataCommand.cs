@@ -1,4 +1,5 @@
-﻿using Qf.Events;
+﻿using Qf.ClassDatas.AudioEdit;
+using Qf.Events;
 using Qf.Models.AudioEdit;
 using QFramework;
 using System;
@@ -29,7 +30,7 @@ namespace Qf.Commands.AudioEdit
         protected override void OnExecute()
         {
             model = this.GetModel<AudioEditModel>();
-            if (model.EditAudioClip == null) return;
+            if (model.EditAudioClip == null||model.Mode.Equals(SystemModeData.PlayMode) )return;
             if(time == -1)
             {
                 model.TimeLineData.Clear();

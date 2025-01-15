@@ -37,12 +37,8 @@ public class InputMode : MonoBehaviour,IController
     }
     void Update()
     {
-        if (drwmsData.DelayTheTriggerTime < TimeOfExistence)
-        {
-            InputRun();
-            return;
-        }
         TimeOfExistence += Time.deltaTime;
+        InputRun();
     }
     void InputRun()
     {

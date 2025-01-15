@@ -31,7 +31,7 @@ namespace Qf.Commands.AudioEdit
         protected override void OnExecute()
         {
             AudioEditModel = this.GetModel<AudioEditModel>();
-            if (AudioEditModel.EditAudioClip == null) return;
+            if (AudioEditModel.EditAudioClip == null || AudioEditModel.Mode.Equals(SystemModeData.PlayMode)) return;
             if (AudioEditModel.TimeLineData.ContainsKey(time))
             {
                 if (AudioEditModel.TimeLineData[time] != null)
