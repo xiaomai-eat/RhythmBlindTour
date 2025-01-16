@@ -4,6 +4,7 @@ using Qf.Events;
 using Qf.Models;
 using Qf.Models.AudioEdit;
 using QFramework;
+using RhythmTool;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -14,8 +15,9 @@ namespace Qf.Managers
     {
         [SerializeField]
         AudioSource audioSource;//音频源
+        [SerializeField]
+        RhythmPlayer rhythmPlayer;//音频处理器
         AudioEditModel editModel;
-        float _PlaySpeed;
         int Mode;
         private void Awake()
         {
@@ -25,7 +27,6 @@ namespace Qf.Managers
         {
             Init();
             this.RegisterEvent<MainAudioChangeValue>(v => UpdateData()).UnRegisterWhenGameObjectDestroyed(gameObject);
-            this.RegisterEvent<BPMChangeValue>(v => { _PlaySpeed = v.BPM / GetBPM(); audioSource.pitch = _PlaySpeed; }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
         public void EnterPlayMode()
         {
@@ -94,7 +95,6 @@ namespace Qf.Managers
         {
             audioSource.time = editModel.ThisTime;
             audioSource.clip = editModel.EditAudioClip;
-            this.SendCommand(new SetAudioEditAudioBPMCommand((int)GetBPM()));
         }
         private void Update()
         {
@@ -112,35 +112,6 @@ namespace Qf.Managers
             }
         }
         
-        float GetBPM()//峰值检测法(准确度不高)
-        {
-            if(audioSource.clip==null) return 0f;
-            float sampleRate = audioSource.clip.frequency;
-            float timeStep = 1.0f / sampleRate;
-            float[] samples = new float[audioSource.clip.samples];
-            audioSource.clip.GetData(samples, 0);
-            float maxPeak = 0;
-            for (int i = 0; i < samples.Length; i++)
-            {
-                if (Mathf.Abs(samples[i]) > maxPeak)
-                {
-                    maxPeak = Mathf.Abs(samples[i]);
-                }
-            }
-
-            float timeBetweenPeaks = 0;
-            for (int i = 0; i < samples.Length; i++)
-            {
-                if (Mathf.Abs(samples[i]) > maxPeak * 0.5f)
-                {
-                    timeBetweenPeaks += timeStep;
-                }
-            }
-
-            float bpm = 60.0f / timeBetweenPeaks;
-            Debug.Log($"[BgAudioManager] BPM:{bpm} 拍数:{60/bpm}");
-            return bpm;
-        }
         public IArchitecture GetArchitecture()
         {
             return GameBody.Interface;
