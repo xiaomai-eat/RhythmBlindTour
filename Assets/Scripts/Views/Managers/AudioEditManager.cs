@@ -11,12 +11,14 @@ using TMPro;
 using UnityEngine;
 namespace Qf.Managers
 {
-    public class BgAudioManager : MonoBehaviour , IController
+    public class AudioEditManager : MonoBehaviour , IController
     {
         [SerializeField]
         AudioSource audioSource;//“Ù∆µ‘¥
         [SerializeField]
         RhythmPlayer rhythmPlayer;//“Ù∆µ¥¶¿Ì∆˜
+        [SerializeField]
+        RhythmAnalyzer rhythmAnalyzer;//“Ù∆µ∑÷Œˆ∆˜
         AudioEditModel editModel;
         int Mode;
         private void Awake()
@@ -95,6 +97,7 @@ namespace Qf.Managers
         {
             audioSource.time = editModel.ThisTime;
             audioSource.clip = editModel.EditAudioClip;
+            rhythmPlayer.rhythmData = rhythmAnalyzer.Analyze(editModel.EditAudioClip);
         }
         private void Update()
         {
