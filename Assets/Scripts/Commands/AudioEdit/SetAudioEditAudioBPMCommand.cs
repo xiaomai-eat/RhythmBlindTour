@@ -20,8 +20,8 @@ namespace Qf.Commands.AudioEdit
         protected override void OnExecute()
         {
             audioEditModel = this.GetModel<AudioEditModel>();
-            if (audioEditModel.EditAudioClip == null || audioEditModel.Mode.Equals(SystemModeData.PlayMode)) return;
-            this.audioEditModel.BPM = value;
+            if (audioEditModel.EditAudioClip == null || audioEditModel.Mode.Equals(SystemModeData.PlayMode) || value<0) return;
+            audioEditModel.BPM = value;
             this.SendEvent(new BPMChangeValue() { BPM = value });
         }
     }

@@ -12,13 +12,14 @@ namespace Qf.Commands.AudioEdit
         SystemModeData LastModeData;
         public SetAudioEditModeCommand(SystemModeData systemModeData)
         {
-            this.CurrentModeData = systemModeData;
+            CurrentModeData = systemModeData;
         }
         protected override void OnExecute()
         {
             AudioEditModel = this.GetModel<AudioEditModel>();
             LastModeData = AudioEditModel.Mode;
             AudioEditModel.Mode = CurrentModeData;
+            if (CurrentModeData.Equals(LastModeData) || AudioEditModel.EditAudioClip == null) return;
             switch (LastModeData)
             {
                 case SystemModeData.EditMode:

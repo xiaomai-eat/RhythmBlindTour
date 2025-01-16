@@ -6502,7 +6502,7 @@ PrefabInstance:
     - target: {fileID: 7427002370446069019, guid: 175487d71a5623f4c9b62fdc94f71dd7, type: 3}
       propertyPath: audioClip
       value: 
-      objectReference: {fileID: 8300000, guid: 5fbd63d0c32be944aa54b8b06c9dc2ae, type: 3}
+      objectReference: {fileID: 8300000, guid: de7eed3ce4ff6734fbe7924553b8abc1, type: 3}
     - target: {fileID: 7427002370446069019, guid: 175487d71a5623f4c9b62fdc94f71dd7, type: 3}
       propertyPath: ManagerOrderOfExecution.Array.size
       value: 1
@@ -8321,8 +8321,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 261104908}
   m_HandleRect: {fileID: 261104907}
   m_Direction: 0
-  m_Value: 1.0000107
-  m_Size: 0.990658
+  m_Value: 0.9999964
+  m_Size: 0.99065936
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10426,7 +10426,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -918.5002, y: 0.0006218621}
+  m_AnchoredPosition: {x: -918.49994, y: 0.0006218621}
   m_SizeDelta: {x: 1820, y: 483}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1702740265

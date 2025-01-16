@@ -7,6 +7,7 @@ using QFramework;
 using RhythmTool;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 namespace Qf.Managers
@@ -28,7 +29,10 @@ namespace Qf.Managers
         void Start()
         {
             Init();
-            this.RegisterEvent<MainAudioChangeValue>(v => UpdateData()).UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<MainAudioChangeValue>(v => {
+                UpdateData();
+                GetBPM();
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
         public void EnterPlayMode()
         {
@@ -41,6 +45,32 @@ namespace Qf.Managers
         public void EnterRecordingMode()
         {
             this.SendCommand(new SetAudioEditModeCommand(ClassDatas.AudioEdit.SystemModeData.RecordingMode));
+        }
+        float sum;
+        public async void GetBPM()
+        {
+            if(rhythmPlayer.rhythmData == null)
+            {
+                Debug.Log("[AudioEditManager] 无分析对象");
+                return;
+            }
+            Debug.Log("[AudioEditManager] 等待分析");
+            await Task.Delay(3000);
+            if (rhythmPlayer.rhythmData == null)
+            {
+                Debug.Log("[AudioEditManager] 无分析对象");
+                return;
+            }
+            Track<Beat> ls = rhythmPlayer.rhythmData.GetTrack<Beat>();
+            sum = 0;
+            for (int i = 0; i < ls.count; i++)
+            {
+                sum += ls[i].bpm;
+            }
+            sum /= ls.count;
+            Debug.Log($"数据组{ls.count},{sum}");
+            this.SendCommand(new SetAudioEditAudioBPMCommand((int)Mathf.Round(sum)));
+            return;
         }
         void Init()
         {
@@ -82,7 +112,7 @@ namespace Qf.Managers
         }
         void UpdateAll()
         {
-            this.SendCommand(new SetAudioEditThisTimeCommand(audioSource.time));
+            this.SendCommand(new SetAudioEditThisTimeCommand(audioSource.time)); //这里可以使用字段优化因为会一直产生垃圾
         }
         void PlayMode()
         {

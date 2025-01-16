@@ -29,7 +29,7 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
     {
         _InputField.onValueChanged.AddListener(v =>
         {
-            if (v.Equals("")) return;
+            if (v.Equals("") || _InputField.text.Equals(v)) return;
             this.SendCommand(new SetAudioEditAudioBPMCommand(int.Parse(v)));
         });
         this.RegisterEvent<OnEditMode>(v =>
