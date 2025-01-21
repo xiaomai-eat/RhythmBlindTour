@@ -2,7 +2,6 @@
 {
     public class MusicData
     {
-        public float DelayTheTriggerTime = 0.1f;
-        public float Speed = 1f;
+        public string PathData;//路径信息
     }
 }

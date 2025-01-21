@@ -15,6 +15,7 @@ public class GameBody : Architecture<GameBody>
     void Models()
     {
         this.RegisterModel(new AudioEditModel());
+        RegisterModel(new DataCachingModel());
         Debug.Log("[GameBody] Modelº”‘ÿÕÍ±œ");
     }
     void Systems()

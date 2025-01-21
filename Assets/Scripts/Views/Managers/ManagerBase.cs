@@ -2,7 +2,7 @@
 using UnityEngine;
 namespace Qf.Managers
 {
-    public abstract class ManagerBase : MonoSingleton<ManagerBase>,IController
+    public abstract class ManagerBase : MonoBehaviour,IController
     {
         public IArchitecture GetArchitecture()
         {

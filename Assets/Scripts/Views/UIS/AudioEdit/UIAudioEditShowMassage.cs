@@ -34,16 +34,16 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         });
         this.RegisterEvent<OnEditMode>(v =>
         {
-            _ModeShow.text = "EditMode";
+            _ModeShow.text = "编辑模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnPlayMode>(v =>
         {
-            _ModeShow.text = "PlayMode";
+            _ModeShow.text = "游玩模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
         this.RegisterEvent<OnRecordingMode>(v =>
         {
-            _ModeShow.text = "RecordingMode";
+            _ModeShow.text = "录制模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {

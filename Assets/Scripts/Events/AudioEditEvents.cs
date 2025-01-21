@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Qf.Events
 {
     /// <summary>
@@ -45,4 +47,12 @@ namespace Qf.Events
         public string Name;
         public float Length;
     };
+    /// <summary>
+    /// —°‘Ò“Ù∆µ
+    /// </summary>
+    public struct SelectAudio
+    {
+        public AudioClip SelectAudioClip;
+        public GameObject SelectObject;
+    }
 }

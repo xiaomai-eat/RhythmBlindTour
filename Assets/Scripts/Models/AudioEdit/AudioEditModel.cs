@@ -20,7 +20,6 @@ namespace Qf.Models.AudioEdit
         public int BeatB=1;
         protected override void OnInit()
         {
-            
         }
     }
 

@@ -95,7 +95,6 @@ namespace Qf.Managers
             {
                 Debug.Log("录制模式");
                 Mode = 2;
-                PlayMode();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
             this.RegisterEvent<ExitPlayMode>(v =>
@@ -123,6 +122,19 @@ namespace Qf.Managers
         {
             audioSource.Pause();
         }
+        /// <summary>
+        /// 控制运行,适用于开关
+        /// </summary>
+        public void ControlRun()
+        {
+            if (editModel.EditAudioClip == null) return;
+            if (audioSource.isPlaying)
+            {
+                ExitPlayMode();
+                return;
+            }
+            PlayMode();
+        }
         void UpdateData()
         {
             audioSource.time = editModel.ThisTime;
@@ -131,18 +143,8 @@ namespace Qf.Managers
         }
         private void Update()
         {
-            if (Mode == 0)//编辑模式
-            {
-
-            }
-            else if (Mode == 1) //游玩模式
-            {
+            if(audioSource.isPlaying)
                 UpdateAll();
-            }
-            else if (Mode == 2)//录制模式
-            {
-                UpdateAll();
-            }
         }
         
         public IArchitecture GetArchitecture()
