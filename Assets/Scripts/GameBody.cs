@@ -2,6 +2,7 @@ using Qf.Models;
 using Qf.Models.AudioEdit;
 using Qf.Systems;
 using QFramework;
+using System;
 using UnityEngine;
 public class GameBody : Architecture<GameBody>
 {
@@ -11,7 +12,15 @@ public class GameBody : Architecture<GameBody>
         Debug.Log("[GameBody] 初始化加载中...");
         Models();
         Systems();
+        Utilitys();
     }
+
+    private void Utilitys()
+    {
+        RegisterUtility(new Storage());
+        Debug.Log("[GameBody] Utility加载完毕");
+    }
+
     void Models()
     {
         this.RegisterModel(new AudioEditModel());

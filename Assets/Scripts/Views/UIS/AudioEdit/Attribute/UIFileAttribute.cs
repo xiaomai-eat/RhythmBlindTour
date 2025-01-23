@@ -1,8 +1,12 @@
+using Qf.Commands.AudioEdit;
+using Qf.Models.AudioEdit;
+using QFramework;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIFileAttributte : UIAttributeBase, IPointerClickHandler
+public class UIFileAttribute : UIAttributeBase, IPointerClickHandler
 {
     [SerializeField]
     TMP_Text ShowFileName;

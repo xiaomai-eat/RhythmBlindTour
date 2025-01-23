@@ -13,15 +13,13 @@ public class SelectManager : ManagerBase
     static UIAttributeBase CurrentAttribute;
     public override void Init()
     {
-        this.RegisterEvent<SelectAudio>(v =>
+        this.RegisterEvent<SelectOptions>(v =>
         {
             if (CurrentAttribute == null) return;
             if (CurrentAttribute.GetParameterType().Equals(ParameterType.File)){
                 //Debug.Log("Ö´ÐÐ");
                 if (CurrentAttribute != null)
-                    this.SendCommand(new SetAudioEditAudioCommand(v.SelectAudioClip));
-                UIFileAttributte ls = (UIFileAttributte)CurrentAttribute;
-                ls.SetShowFileName(v.SelectAudioClip.name);
+                    ((UIFileAttribute)CurrentAttribute).RunAction(v.SelectValue);
             }
             
         }).UnRegisterWhenGameObjectDestroyed(gameObject);

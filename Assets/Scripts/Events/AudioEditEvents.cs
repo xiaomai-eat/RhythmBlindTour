@@ -50,9 +50,9 @@ namespace Qf.Events
     /// <summary>
     /// —°‘Ò“Ù∆µ
     /// </summary>
-    public struct SelectAudio
+    public struct SelectOptions
     {
-        public AudioClip SelectAudioClip;
+        public object SelectValue;
         public GameObject SelectObject;
     }
 }
