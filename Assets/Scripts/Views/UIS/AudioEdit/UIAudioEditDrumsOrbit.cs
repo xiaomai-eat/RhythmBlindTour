@@ -77,6 +77,7 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
                 gorecttransform = go.GetComponent<RectTransform>();
                 go.transform.position = new Vector3(transform.position.x, DrumsUI[i].transform.position.y- (_EditHeight / DrumsUI.Length/2),transform.position.z);
                 gorecttransform.anchoredPosition = new Vector2(item * _PixelUnitsPerSecond, gorecttransform.anchoredPosition.y);
+                gorecttransform.sizeDelta = new Vector2(a[item][i].DrwmsData.TimeOfExistence* gorecttransform.sizeDelta.x , gorecttransform.sizeDelta.y);
                 uiDrums = go.GetComponent<UIAudioEditDrums>();
                 uiDrums.SetColor(new Color(Random.Range(0,101)/(float)100,Random.Range(0, 101) / (float)100, Random.Range(0, 101) / (float)100, 1));
                 uiDrums.ThisTime = item;

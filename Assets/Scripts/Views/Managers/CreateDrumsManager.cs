@@ -15,7 +15,7 @@ public class CreateDrumsManager : ManagerBase
     [SerializeField]
     AudioSource audioSource;
     AudioEditModel editModel;
-    List<GameObject> gameObjects = new();
+    List<InputMode> gameObjects = new();
     public override void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
@@ -26,15 +26,16 @@ public class CreateDrumsManager : ManagerBase
             {
                 foreach (var i in editModel.TimeLineData[v.ThisTime])
                 {
-
-                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation).GetInputMode().gameObject);
+                    //这里要处理一个问题(音效提示,时长会影响鼓点的表现长度(就是时间轴上的鼓点长度))
+                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation).GetInputMode());
                 }
             }
             else if (!editModel.Mode.Equals(SystemModeData.PlayMode))
             {
+                //同上一样的显示问题,这里处理的是离开范围后关闭对应显示的鼓点
                 foreach (var j in gameObjects)
                 {
-                    Destroy(j);
+                    Destroy(j.gameObject);
                 }
                 gameObjects.Clear();
             }
@@ -47,7 +48,7 @@ public class CreateDrumsManager : ManagerBase
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="vector3"></param>
-    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default)
+    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default,DrumsLoadData drumsLoadData = null)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
@@ -111,7 +112,7 @@ public class CreateDrumsManager : ManagerBase
         {
             if (Clip != null)
                 _Mode.PreAdventClip = Clip;
-            _Mode.DrwmsData.PreAdventAudioClipOffsetTime = DelayTime;
+            _Mode.DrwmsData.DrwmsData.PreAdventAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
         /// <summary>

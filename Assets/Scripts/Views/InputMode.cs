@@ -9,8 +9,8 @@ public class InputMode : MonoBehaviour,IController
     [SerializeField]
     TheTypeOfOperation operation;
     AudioEditModel editModel;
-    DrwmsData drwmsData = new();
-    public DrwmsData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
+    DrumsLoadData drwmsData = new();//鼓点数据
+    public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     [SerializeField]
     float TimeOfExistence;//鼓点存在时间
     [SerializeField]
@@ -40,6 +40,8 @@ public class InputMode : MonoBehaviour,IController
     void Update()
     {
         TimeOfExistence += Time.deltaTime;
+        if (TimeOfExistence >= drwmsData.DrwmsData.TimeOfExistence)
+            Destroy(gameObject);
         if(editModel.Mode.Equals(SystemModeData.PlayMode))
             InputRun();
     }
