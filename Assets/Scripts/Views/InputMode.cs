@@ -4,7 +4,7 @@ using Qf.Systems;
 using QFramework;
 using UnityEngine;
 
-public class InputMode : MonoBehaviour,IController
+public class InputMode : MonoBehaviour, IController
 {
     [SerializeField]
     TheTypeOfOperation operation;
@@ -21,7 +21,7 @@ public class InputMode : MonoBehaviour,IController
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
     [SerializeField]
     AudioClip _FailClip;//失败时的音频
-    public AudioClip FailClip { get { return _FailClip; }  set { _FailClip = value; } }
+    public AudioClip FailClip { get { return _FailClip; } set { _FailClip = value; } }
     //[SerializeField]
     //bool isPlay;//是否被点击(用于处理同时出现的情况目前来说用不着)
     public SpriteRenderer SpriteRenderer;
@@ -39,11 +39,12 @@ public class InputMode : MonoBehaviour,IController
     }
     void Update()
     {
+        if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
         TimeOfExistence += Time.deltaTime;
         if (TimeOfExistence >= drwmsData.DrwmsData.TimeOfExistence)
             Destroy(gameObject);
-        if(editModel.Mode.Equals(SystemModeData.PlayMode))
-            InputRun();
+
+        InputRun();
     }
     void InputRun()
     {
