@@ -1,10 +1,12 @@
 using Qf.ClassDatas;
+using Qf.ClassDatas.AudioEdit;
 using Qf.Commands.AudioEdit;
 using Qf.Events;
 using Qf.Models;
 using Qf.Models.AudioEdit;
 using QFramework;
 using RhythmTool;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -107,11 +109,30 @@ namespace Qf.Managers
             {
                 Debug.Log("退出录制模式");
                 ExitPlayMode();
-            });
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<OnUpdateThisTime>(v =>
+            {
+                editModel.ThisTime = v.ThisTime;
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
+            this.RegisterEvent<OnStartThisTime>(v =>
+            {
+                thisTime = v.ThisTime;
+            }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
+        float thisTime;
+        float ls;
         void UpdateAll()
         {
-            this.SendCommand(new SetAudioEditThisTimeCommand(audioSource.time)); //这里可以使用字段优化因为会一直产生垃圾
+            thisTime += 0.01f;
+            ls += 0.01f;
+            if(ls >= 0.01f)
+            {
+                ls = 0;
+                this.SendEvent(new OnUpdateThisTime()
+                {
+                    ThisTime = (float)(Math.Round(thisTime,2,MidpointRounding.ToEven))
+                });
+            }
         }
         void PlayMode()
         {
@@ -143,10 +164,13 @@ namespace Qf.Managers
         }
         private void Update()
         {
-            if(audioSource.isPlaying)
+            
+        }
+        private void FixedUpdate()
+        {
+            if (audioSource.isPlaying)
                 UpdateAll();
         }
-        
         public IArchitecture GetArchitecture()
         {
             return GameBody.Interface;

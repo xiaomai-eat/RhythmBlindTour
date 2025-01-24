@@ -32,6 +32,10 @@ namespace Qf.Events
     public struct OnUpdateThisTime {
         public float ThisTime;
     };
+    public struct OnStartThisTime
+    {
+        public float ThisTime;
+    }
     /// <summary>
     /// ¸üÐÂ¹ÄµãUI
     /// </summary>

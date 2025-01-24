@@ -7,8 +7,6 @@ namespace Qf.ClassDatas.AudioEdit
         public Color Color;//颜色
         public TheTypeOfOperation theTypeOfOperation;//鼓点类型
         public float PreAdventAudioClipOffsetTime = 0.2f;//正数为向当前音频时间加n偏移负数为向当前音频时间减n偏移
-        public float SucceedAudioClipOffsetTime = 0;//成功偏移
-        public float FailAudioClipOffsetTime = 0;//失败偏移
         public string PreAdventAudioClipPath;//来临前的音频数据路径
         public string SucceedAudioClipPath;//成功时的音频数据路径
         public string FailAudioClipPath;//失败时的音频路径

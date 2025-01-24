@@ -1,4 +1,5 @@
 using Qf.ClassDatas.AudioEdit;
+using Qf.Models.AudioEdit;
 using Qf.Systems;
 using QFramework;
 using UnityEngine;
@@ -7,6 +8,7 @@ public class InputMode : MonoBehaviour,IController
 {
     [SerializeField]
     TheTypeOfOperation operation;
+    AudioEditModel editModel;
     DrwmsData drwmsData = new();
     public DrwmsData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     [SerializeField]
@@ -29,7 +31,7 @@ public class InputMode : MonoBehaviour,IController
     }
     void Init()
     {
-
+        editModel = this.GetModel<AudioEditModel>();
     }
     void Start()
     {
@@ -38,7 +40,8 @@ public class InputMode : MonoBehaviour,IController
     void Update()
     {
         TimeOfExistence += Time.deltaTime;
-        InputRun();
+        if(editModel.Mode.Equals(SystemModeData.PlayMode))
+            InputRun();
     }
     void InputRun()
     {

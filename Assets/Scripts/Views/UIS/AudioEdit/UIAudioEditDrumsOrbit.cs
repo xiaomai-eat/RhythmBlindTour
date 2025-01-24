@@ -1,5 +1,6 @@
 using Qf.Commands.AudioEdit;
 using Qf.Events;
+using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using QFramework;
 using System.Collections.Generic;
@@ -15,25 +16,24 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
     List<GameObject> DrumsUIInDrums = new ();
     int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
     int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
+    AudioEditModel editModel;
     IArchitecture IBelongToArchitecture.GetArchitecture()
     {
         return GameBody.Interface;
     }
     public void AddDrwms()
     {
-        Debug.Log("生成鼓点");
+        Debug.Log($"生成鼓点{editModel.ThisTime}");
         this.SendCommand(new AddAudioEditTimeLineDataCommand(
-            this.SendQuery(
-                new QueryAudioEditAudioClipThisTime()),
+            editModel.ThisTime,
             new Qf.ClassDatas.AudioEdit.DrumsLoadData()));
     }
 
     public void RemoveDrwms(int index = -1)
     {
-        Debug.Log("删除鼓点");
+        Debug.Log($"删除鼓点{editModel.ThisTime}");
         this.SendCommand(new RemoveAudioEditTimeLineDataCommand(
-            this.SendQuery(
-                new QueryAudioEditAudioClipThisTime()),
+            editModel.ThisTime,
             index
             ));
     }
@@ -43,9 +43,11 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
     }
     void Init()
     {
+        editModel = this.GetModel<AudioEditModel>();
         StartLength();
         this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v => UpDateDrwmsUI()).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
+
     }
     void UpDateDrwmsUI()//这里需要优化<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<(目前仅暂时实现功能)
     {

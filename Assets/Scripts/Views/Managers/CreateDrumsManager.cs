@@ -2,6 +2,7 @@ using MoonSharp.VsCodeDebugger.SDK;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Events;
 using Qf.Managers;
+using Qf.Models.AudioEdit;
 using QFramework;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,9 +14,32 @@ public class CreateDrumsManager : ManagerBase
 {
     [SerializeField]
     AudioSource audioSource;
+    AudioEditModel editModel;
+    List<GameObject> gameObjects = new();
     public override void Init()
     {
+        editModel = this.GetModel<AudioEditModel>();
         CreateSetClass.Instance = new CreateSetClass(audioSource);
+        this.RegisterEvent<OnUpdateThisTime>(v =>
+        {
+            if (editModel.TimeLineData.ContainsKey(v.ThisTime))
+            {
+                foreach (var i in editModel.TimeLineData[v.ThisTime])
+                {
+
+                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation).GetInputMode().gameObject);
+                }
+            }
+            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))
+            {
+                foreach (var j in gameObjects)
+                {
+                    Destroy(j);
+                }
+                gameObjects.Clear();
+            }
+
+        }).UnRegisterWhenGameObjectDestroyed(gameObject);
         Debug.Log("CreateDrumsManager 已加载...");
     }
     /// <summary>
@@ -23,13 +47,15 @@ public class CreateDrumsManager : ManagerBase
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="vector3"></param>
-    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3)
+    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
         CreateSetClass.Instance.SetInputMode(mode);
         mode.SetOperation(operation);
-        gameObject.transform.position = vector3;
+        if (vector3.Equals(default))
+            mode.transform.position = new Vector3(0, 0, 0);
+        // gameObject.transform.position = vector3;
         return CreateSetClass.Instance;
     }
 
@@ -65,6 +91,10 @@ public class CreateDrumsManager : ManagerBase
         {
             _Mode = inputMode;
         }
+        public InputMode GetInputMode()
+        {
+            return _Mode;
+        }
         /// <summary>
         /// 设置触发成功音效(音效及延迟时间)
         /// </summary>
@@ -72,7 +102,6 @@ public class CreateDrumsManager : ManagerBase
         {
             if (Clip != null)
                 _Mode.SuccessClip = Clip;
-            _Mode.DrwmsData.SucceedAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
         /// <summary>
@@ -92,7 +121,6 @@ public class CreateDrumsManager : ManagerBase
         {
             if (Clip != null)
                 _Mode.FailClip = Clip;
-            _Mode.DrwmsData.FailAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
         void SetCpVector(ChannelPosition channelPosition)

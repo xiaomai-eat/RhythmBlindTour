@@ -1,6 +1,7 @@
 ﻿using Qf.Events;
 using Qf.Models.AudioEdit;
 using QFramework;
+using System;
 
 namespace Qf.Commands.AudioEdit
 {
@@ -16,7 +17,7 @@ namespace Qf.Commands.AudioEdit
         /// <param name="time">时间</param>
         public SetAudioEditThisTimeCommand(float time)
         {
-            value = time;
+            value = (float)Math.Round(time, 2, MidpointRounding.ToEven);
         }
         protected override void OnExecute()
         {
@@ -29,17 +30,23 @@ namespace Qf.Commands.AudioEdit
                 {
                     audioEditModel.ThisTime = audioEditModel.EditAudioClip.length;
                 }
-                else if(value<0)
+                else if(value<=0)
                 {
-                    audioEditModel.ThisTime = 0;
+                    value = 0;
+                    audioEditModel.ThisTime = value;
                 }
                 else
                 {
                     audioEditModel.ThisTime = value;
                 }
+                value = (float)Math.Round(value, 2, MidpointRounding.ToEven);
                 this.SendEvent(new OnUpdateThisTime()
                 {
-                    ThisTime = audioEditModel.ThisTime
+                    ThisTime = value
+                });
+                this.SendEvent(new OnStartThisTime()
+                {
+                    ThisTime = value
                 });
             }
         }
