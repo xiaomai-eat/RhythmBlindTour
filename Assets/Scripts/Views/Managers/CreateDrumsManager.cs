@@ -35,6 +35,7 @@ public class CreateDrumsManager : ManagerBase
                 //同上一样的显示问题,这里处理的是离开范围后关闭对应显示的鼓点
                 foreach (var j in gameObjects)
                 {
+                    if(j != null)
                     Destroy(j.gameObject);
                 }
                 gameObjects.Clear();

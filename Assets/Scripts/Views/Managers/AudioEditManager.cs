@@ -14,7 +14,7 @@ using TMPro;
 using UnityEngine;
 namespace Qf.Managers
 {
-    public class AudioEditManager : MonoBehaviour , IController
+    public class AudioEditManager : MonoBehaviour, IController
     {
         [SerializeField]
         AudioSource audioSource;//音频源
@@ -31,7 +31,8 @@ namespace Qf.Managers
         void Start()
         {
             Init();
-            this.RegisterEvent<MainAudioChangeValue>(v => {
+            this.RegisterEvent<MainAudioChangeValue>(v =>
+            {
                 UpdateData();
                 GetBPM();
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
@@ -51,7 +52,7 @@ namespace Qf.Managers
         float sum;
         public async void GetBPM()
         {
-            if(rhythmPlayer.rhythmData == null)
+            if (rhythmPlayer.rhythmData == null)
             {
                 Debug.Log("[AudioEditManager] 无分析对象");
                 return;
@@ -77,7 +78,7 @@ namespace Qf.Managers
         void Init()
         {
             editModel = this.GetModel<AudioEditModel>();
-            if(editModel.EditAudioClip != null)
+            if (editModel.EditAudioClip != null)
             {
                 audioSource.clip = editModel.EditAudioClip;
             }
@@ -117,6 +118,7 @@ namespace Qf.Managers
             this.RegisterEvent<OnStartThisTime>(v =>
             {
                 thisTime = v.ThisTime;
+                audioSource.time = v.ThisTime;
             }).UnRegisterWhenGameObjectDestroyed(gameObject);
         }
         float thisTime;
@@ -125,12 +127,12 @@ namespace Qf.Managers
         {
             thisTime += 0.01f;
             ls += 0.01f;
-            if(ls >= 0.01f)
+            if (ls >= 0.01f)
             {
                 ls = 0;
                 this.SendEvent(new OnUpdateThisTime()
                 {
-                    ThisTime = (float)(Math.Round(thisTime,2,MidpointRounding.ToEven))
+                    ThisTime = (float)(Math.Round(thisTime, 2, MidpointRounding.ToEven))
                 });
             }
         }
@@ -164,7 +166,7 @@ namespace Qf.Managers
         }
         private void Update()
         {
-            
+
         }
         private void FixedUpdate()
         {

@@ -23,7 +23,6 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
     }
     public void AddDrwms()
     {
-        Debug.Log($"Éú³É¹Äµã{editModel.ThisTime}");
         this.SendCommand(new AddAudioEditTimeLineDataCommand(
             editModel.ThisTime,
             new Qf.ClassDatas.AudioEdit.DrumsLoadData()));

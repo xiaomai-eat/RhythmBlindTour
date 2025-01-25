@@ -30,6 +30,10 @@ namespace Qf.Commands.AudioEdit
                 {
                     audioEditModel.ThisTime = audioEditModel.EditAudioClip.length;
                 }
+                else if ((audioEditModel.ThisTime == 0 && value <= 0) || (float)Math.Round(audioEditModel.ThisTime, 2, MidpointRounding.ToEven) == value)
+                {
+                    return;
+                }
                 else if(value<=0)
                 {
                     value = 0;
