@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.UI;
 public class UIDrawAScale : MonoBehaviour, IController
 {
+    /// <summary>
+    /// 需求：方向键单击切换小节中的位置,CTRL+方向建在小节之间切换
+    /// </summary>
     [SerializeField]
     RectTransform progressBar; // 进度条的RectTransform
     [SerializeField]
