@@ -11,7 +11,7 @@ public class Test2 : MonoBehaviour,IController
     {
         this.RegisterEvent<SelectOptions>(v =>
         {
-            Debug.Log($"{((Object)v.SelectObject).name}");
+            Debug.Log($"{v.SelectObject.name}");
         }).UnRegisterWhenDisabled(gameObject);
     }
     public void Save()

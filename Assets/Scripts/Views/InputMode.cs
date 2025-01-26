@@ -1,7 +1,9 @@
 using Qf.ClassDatas.AudioEdit;
+using Qf.Managers;
 using Qf.Models.AudioEdit;
 using Qf.Systems;
 using QFramework;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class InputMode : MonoBehaviour, IController
@@ -11,6 +13,8 @@ public class InputMode : MonoBehaviour, IController
     AudioEditModel editModel;
     DrumsLoadData drwmsData = new();//鼓点数据
     public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
+    public float StartTime;
+    public float EndTime;
     [SerializeField]
     float TimeOfExistence;//鼓点存在时间
     [SerializeField]
@@ -20,8 +24,8 @@ public class InputMode : MonoBehaviour, IController
     AudioClip _SucceedClip;//成功时的音频
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
     [SerializeField]
-    AudioClip _FailClip;//失败时的音频
-    public AudioClip FailClip { get { return _FailClip; } set { _FailClip = value; } }
+    AudioClip _LoseClip;//失败时的音频
+    public AudioClip LoseClip { get { return _LoseClip; } set { _LoseClip = value; } }
     //[SerializeField]
     //bool isPlay;//是否被点击(用于处理同时出现的情况目前来说用不着)
     public SpriteRenderer SpriteRenderer;
@@ -32,6 +36,13 @@ public class InputMode : MonoBehaviour, IController
     void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
+        StartTime = editModel.ThisTime;
+        if (editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence > editModel.EditAudioClip.length)
+        {
+            EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence) - editModel.EditAudioClip.length);
+            return;
+        }
+        EndTime = editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence;
     }
     void Start()
     {
@@ -42,8 +53,7 @@ public class InputMode : MonoBehaviour, IController
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
         TimeOfExistence += Time.deltaTime;
         if (TimeOfExistence >= drwmsData.DrwmsData.TimeOfExistence)
-            Destroy(gameObject);
-
+            Lose();
         InputRun();
     }
     void InputRun()
@@ -74,35 +84,65 @@ public class InputMode : MonoBehaviour, IController
         if (InputSystems.SwipeUp)
         {
             Debug.Log("上滑");
+            Succeed();
+            return;
         }
+        if (!InputSystems.PlayClick) return;
+        Lose();
     }
     void SwipeDown()
     {
         if (InputSystems.SwipeDown)
         {
             Debug.Log("下滑");
+            Succeed();
+            return;
         }
+        if (!InputSystems.PlayClick) return;
+        Lose();
     }
     void SwipeLeft()
     {
         if (InputSystems.SwipeLeft)
         {
             Debug.Log("左滑");
+            Succeed();
+            return;
         }
+        if (!InputSystems.PlayClick) return;
+        Lose();
     }
     void SwipeRight()
     {
         if (InputSystems.SwipeRight)
         {
             Debug.Log("右滑");
+            Succeed();
+            return;
         }
+        if (!InputSystems.PlayClick) return;
+        Lose();
     }
     void Click()
     {
         if (InputSystems.Click)
         {
             Debug.Log("点击");
+            Succeed();
+            return;
         }
+        if (!InputSystems.PlayClick) return;
+        Lose();
+    }
+    void Succeed()
+    {
+        AudioEditManager.Instance.Play(_SucceedClip);
+        Destroy(gameObject);
+    }
+    void Lose()
+    {
+        AudioEditManager.Instance.Play(_LoseClip);
+        Destroy(gameObject);
     }
     public void SetOperation(TheTypeOfOperation theTypeOfOperation)
     {

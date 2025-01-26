@@ -2,6 +2,7 @@ using MoonSharp.VsCodeDebugger.SDK;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Events;
 using Qf.Managers;
+using Qf.Models;
 using Qf.Models.AudioEdit;
 using QFramework;
 using System.Collections;
@@ -15,31 +16,47 @@ public class CreateDrumsManager : ManagerBase
     [SerializeField]
     AudioSource audioSource;
     AudioEditModel editModel;
+    DataCachingModel cachingModel;
     List<InputMode> gameObjects = new();
     public override void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
+        cachingModel = this.GetModel<DataCachingModel>();
         CreateSetClass.Instance = new CreateSetClass(audioSource);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
+            Debug.Log(v.ThisTime);
+            if (editModel.TipsAudio.ContainsKey(v.ThisTime))
+            {
+                AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray());
+            }
             if (editModel.TimeLineData.ContainsKey(v.ThisTime))
             {
                 foreach (var i in editModel.TimeLineData[v.ThisTime])
                 {
-                    //这里要处理一个问题(音效提示,时长会影响鼓点的表现长度(就是时间轴上的鼓点长度))
-                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation).GetInputMode());
+                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation, default, i).GetInputMode());
                 }
             }
             else if (!editModel.Mode.Equals(SystemModeData.PlayMode))
             {
-                //同上一样的显示问题,这里处理的是离开范围后关闭对应显示的鼓点
+                List<InputMode> ls = new();
                 foreach (var j in gameObjects)
                 {
-                    if(j != null)
-                    Destroy(j.gameObject);
+                    if (j != null)
+                    {
+                        if (v.ThisTime > j.EndTime || v.ThisTime < j.StartTime)
+                        {
+                            ls.Add(j);
+                            Destroy(j.gameObject);
+                        }
+                    }
                 }
-                gameObjects.Clear();
+                foreach(var e in ls)
+                {
+                    gameObjects.Remove(e);
+                }
             }
+            
 
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         Debug.Log("CreateDrumsManager 已加载...");
@@ -49,10 +66,13 @@ public class CreateDrumsManager : ManagerBase
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="vector3"></param>
-    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default,DrumsLoadData drumsLoadData = null)
+    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default, DrumsLoadData drumsLoadData = null)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
+        mode.DrwmsData = drumsLoadData;
+        mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.LoseAudioClipPath);
+        mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.SucceedAudioClipPath);
         CreateSetClass.Instance.SetInputMode(mode);
         mode.SetOperation(operation);
         if (vector3.Equals(default))
@@ -97,6 +117,11 @@ public class CreateDrumsManager : ManagerBase
         {
             return _Mode;
         }
+        public InputMode SetData(DrumsLoadData drumsLoadData)
+        {
+            _Mode.DrwmsData = drumsLoadData;
+            return _Mode;
+        }
         /// <summary>
         /// 设置触发成功音效(音效及延迟时间)
         /// </summary>
@@ -122,7 +147,7 @@ public class CreateDrumsManager : ManagerBase
         public void SetFailureSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
-                _Mode.FailClip = Clip;
+                _Mode.LoseClip = Clip;
             SetCpVector(channelPosition);
         }
         void SetCpVector(ChannelPosition channelPosition)

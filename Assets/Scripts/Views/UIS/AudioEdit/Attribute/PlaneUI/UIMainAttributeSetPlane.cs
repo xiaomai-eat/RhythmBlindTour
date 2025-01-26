@@ -16,6 +16,8 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
     UIFileAttribute LoseAudio;//失败音频
     [SerializeField]
     UIValueAttribute TipOffset;//偏移量
+    [SerializeField]
+    UIValueAttribute TimeOfExistence;//鼓点存在时间
     AudioEditModel editModel;
     private void OnEnable()
     {
@@ -47,13 +49,27 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
         });
         TipOffset.SetAction(v => 
         {
-            editModel.TipOffset.Value = float.Parse((string)v);
+            if(!v.Equals(""))
+                editModel.TipOffset.Value = float.Parse((string)v);
+            else
+                editModel.TipOffset.Value = 0;
+        });
+        TimeOfExistence.SetAction(v =>
+        {
+            if (!v.Equals(""))
+                editModel.TimeOfExistence.Value = float.Parse((string)v);
+            else
+                editModel.TipOffset.Value = 0;
         });
         editModel.TipOffset.Register(v =>
         {
             TipOffset.SetValueShow(v.ToString());
         }).UnRegisterWhenDisabled(gameObject);
-        this.RegisterEvent<MainAudioChangeValue>(v =>
+        editModel.TimeOfExistence.Register(v =>
+        {
+            TimeOfExistence.SetValueShow(v.ToString());
+        }).UnRegisterWhenDisabled(gameObject);
+        this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v =>
         {
             UpdateAll();
         }).UnRegisterWhenDisabled(gameObject);
@@ -68,6 +84,21 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
         if (editModel.LoseAudioClip != null)
             LoseAudio.SetShowFileName(editModel.LoseAudioClip.name);
         TipOffset.SetValueShow(editModel.TipOffset.ToString());
+        TimeOfExistence.SetValueShow(editModel.TimeOfExistence.ToString());
+    }
+    public void UpdateAllData()
+    {
+        foreach(var i in editModel.TimeLineData.Keys)
+        {
+            foreach(var j in editModel.TimeLineData[i])
+            {
+                j.DrwmsData.SucceedAudioClipPath = editModel.SucceedAudioClip.name;
+                j.DrwmsData.LoseAudioClipPath = editModel.LoseAudioClip.name;
+                j.DrwmsData.PreAdventAudioClipOffsetTime = editModel.TipOffset.Value;
+                j.DrwmsData.TimeOfExistence = editModel.TimeOfExistence.Value;
+            }
+        }
+        this.SendEvent<OnUpdateAudioEditDrumsUI>();
     }
     void Update()
     {

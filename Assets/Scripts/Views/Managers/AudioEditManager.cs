@@ -19,14 +19,34 @@ namespace Qf.Managers
         [SerializeField]
         AudioSource audioSource;//音频源
         [SerializeField]
+        List<AudioSource> vfxSource;//音效音频源
+        [SerializeField]
         RhythmPlayer rhythmPlayer;//音频处理器
         [SerializeField]
         RhythmAnalyzer rhythmAnalyzer;//音频分析器
         AudioEditModel editModel;
         int Mode;
+        public static AudioEditManager Instance;
+        /// <summary>
+        /// 播放特效音
+        /// </summary>
+        /// <param name="audioClip"></param>
+        int index;
+        public void Play(params AudioClip[] audioClip)
+        {
+            if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+            foreach (var i in audioClip)
+            {
+                vfxSource[index].clip = i;
+                vfxSource[index].Play();
+                index++;
+                if (index >= vfxSource.Count)
+                    index = 0;
+            }
+        }
         private void Awake()
         {
-
+            Instance = this;
         }
         void Start()
         {
@@ -50,8 +70,11 @@ namespace Qf.Managers
             this.SendCommand(new SetAudioEditModeCommand(ClassDatas.AudioEdit.SystemModeData.RecordingMode));
         }
         float sum;
+        bool isRunGetBPM;
         public async void GetBPM()
         {
+            if (isRunGetBPM) return;
+            isRunGetBPM = true;
             if (rhythmPlayer.rhythmData == null)
             {
                 Debug.Log("[AudioEditManager] 无分析对象");
@@ -59,6 +82,7 @@ namespace Qf.Managers
             }
             Debug.Log("[AudioEditManager] 等待分析");
             await Task.Delay(3000);
+            isRunGetBPM = false;
             if (rhythmPlayer.rhythmData == null)
             {
                 Debug.Log("[AudioEditManager] 无分析对象");

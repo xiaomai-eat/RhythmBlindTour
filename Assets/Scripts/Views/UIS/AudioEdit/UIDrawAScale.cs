@@ -28,6 +28,11 @@ public class UIDrawAScale : MonoBehaviour, IController
     }
     void GenerateScales()
     {
+        foreach(var i in _JGameObjects)
+        {
+            Destroy(i.gameObject);
+        }
+        _JGameObjects.Clear();
         for (int i = 0; i < numberOfScales; i++)
         {
             GameObject scale = new GameObject("Scale" + i);

@@ -17,9 +17,16 @@ public class UIAudioEditWaveformDiagram : MonoBehaviour, IController
     Color notWaveFormDiagramColor = Color.clear;//非波形图区域颜色
     int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//每秒像素单位
     int _EditHeight = AudioEditConfig.EditHeight;//编辑器可编辑范围高度
-    void Init()
+    AudioClip LastAudioClip;
+    /// <summary>
+    /// 生成波形图
+    /// </summary>
+    /// <param name="CompulsionRun">强制执行生成波形图纹理(如果为false则会判断当前主音频是否不同)</param>
+    void Init(bool CompulsionRun =false)
     {
         AudioClip music = this.GetModel<AudioEditModel>().EditAudioClip;
+        if (!CompulsionRun)
+            if (music == LastAudioClip) { Debug.Log("重复音频不做波纹处理"); LastAudioClip = music; return; }
         if (music == null) { Debug.Log("没有待处理的音频初始化"); return; }
         Debug.Log("初始化音乐波形图名称: " + music.name);
         Debug.Log(music.length);
@@ -67,11 +74,11 @@ public class UIAudioEditWaveformDiagram : MonoBehaviour, IController
             }
         }
         waveformTexture.Apply();
-        musicWaveFormDiagramShow.sprite= Sprite.Create(waveformTexture,new Rect(0,0,waveformTexture.width,waveformTexture.height),new Vector2(0.5f,0.5f));
+        musicWaveFormDiagramShow.sprite = Sprite.Create(waveformTexture, new Rect(0, 0, waveformTexture.width, waveformTexture.height), new Vector2(0.5f, 0.5f));
     }
     void Start()
     {
-        this.RegisterEvent<MainAudioChangeValue>(v =>Init()).UnRegisterWhenGameObjectDestroyed(gameObject);
+        this.RegisterEvent<MainAudioChangeValue>(v => Init()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
     void Update()
     {

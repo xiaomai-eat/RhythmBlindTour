@@ -16,11 +16,11 @@ namespace Qf.Querys.AudioEdit
         protected override AudioClip OnDo()
         {
             cachingModel = this.GetModel<DataCachingModel>();
-            foreach(var i in cachingModel.ResourceAudioDatas)
+            foreach(var i in cachingModel.ResourceAudioDatas.Keys)
             {
-                if (i.name.Equals(AudioClipName))
+                if (i.Equals(AudioClipName))
                 {
-                    return i;
+                    return cachingModel.ResourceAudioDatas[i];
                 }
             }
             return null;

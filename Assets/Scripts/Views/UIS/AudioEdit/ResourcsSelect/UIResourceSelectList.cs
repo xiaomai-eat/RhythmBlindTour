@@ -15,7 +15,7 @@ public class UIResourceSelectList : MonoBehaviour, IController
     List<AudioClip> audioClips;
     private void Start()
     {
-        audioClips = this.GetModel<DataCachingModel>().ResourceAudioDatas;
+        audioClips = this.GetModel<DataCachingModel>().GetListAudioClips();
     }
     UIResourceItem resourceItem;
     public void UpDateList()

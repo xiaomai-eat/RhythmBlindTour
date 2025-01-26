@@ -250,7 +250,7 @@ namespace QFramework
 
     #region Model
 
-    public interface IModel : IBelongToArchitecture, ICanSetArchitecture, ICanGetUtility, ICanSendEvent, ICanInit,ICanSendCommand,ICanGetModel,ICanSendQuery
+    public interface IModel : IBelongToArchitecture, ICanSetArchitecture, ICanGetUtility, ICanSendEvent, ICanInit,ICanSendCommand,ICanGetModel,ICanSendQuery,ICanRegisterEvent
     {
     }
 

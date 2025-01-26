@@ -4,7 +4,6 @@ using Qf.Querys.AudioEdit;
 using QFramework;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class UIAudioEditBottonPlane : MonoBehaviour ,IController
 {
     [SerializeField]
