@@ -2,6 +2,7 @@
 using DG.Tweening;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Events;
+using Qf.Managers;
 using QFramework;
 using System;
 using System.Collections;
@@ -59,5 +60,6 @@ public class UIResourceItem : MonoBehaviour,IController,IPointerClickHandler
             transform.DOScale(new Vector3(1, 1, 1), 0.1f).SetEase(Ease.Linear);
         });
         this.SendEvent(new SelectOptions() { SelectValue = audioClip,SelectObject = gameObject });
+        AudioEditManager.Instance.OnePlay(audioClip);
     }
 }

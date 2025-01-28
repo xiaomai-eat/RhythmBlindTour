@@ -32,9 +32,16 @@ namespace Qf.Managers
         /// </summary>
         /// <param name="audioClip"></param>
         int index;
-        public void Play(params AudioClip[] audioClip)
+        public void Play(AudioClip[] audioClip,float[] volume =null)
         {
-            if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+            int startindex = index;
+            foreach(var i in volume)
+            {
+                vfxSource[startindex].volume = i;
+                startindex++;
+                if (startindex >= volume.Length)
+                    startindex = 0;
+            }
             foreach (var i in audioClip)
             {
                 vfxSource[index].clip = i;
@@ -42,6 +49,20 @@ namespace Qf.Managers
                 index++;
                 if (index >= vfxSource.Count)
                     index = 0;
+                vfxSource[index].volume = 1;
+            }
+        }
+        public async void OnePlay(AudioClip audioClip)
+        {
+            vfxSource[0].clip = audioClip;
+            vfxSource[0].Play();
+            if (audioClip.length >= 3)
+            {
+                await Task.Delay(3000);
+                if(vfxSource[0].clip == audioClip)
+                {
+                    vfxSource[0].Pause();
+                }
             }
         }
         private void Awake()

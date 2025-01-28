@@ -1,5 +1,6 @@
 using Qf.Commands.AudioEdit;
 using Qf.Events;
+using Qf.Managers;
 using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using QFramework;
@@ -18,18 +19,27 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
     [SerializeField]
     TMP_Text _AudioNameShow;
     [SerializeField]
-    TMP_InputField _InputField;
+    TMP_InputField _BPM;
+    [SerializeField]
+    Button _GetBPMButton;
+    [SerializeField]
+    TMP_Dropdown _A;
+    [SerializeField]
+    TMP_Dropdown _B;
     public IArchitecture GetArchitecture()
     {
         return GameBody.Interface;
     }
-
-    // Start is called before the first frame update
     void Start()
     {
-        _InputField.onValueChanged.AddListener(v =>
+        _GetBPMButton.onClick.AddListener(() =>
         {
-            if (v.Equals("") || _InputField.text.Equals(v)) return;
+            if (AudioEditManager.Instance != null)
+                AudioEditManager.Instance.GetBPM();
+        });
+        _BPM.onValueChanged.AddListener(v =>
+        {
+            if (v.Equals("")) return;
             this.SendCommand(new SetAudioEditAudioBPMCommand(int.Parse(v)));
         });
         this.RegisterEvent<OnEditMode>(v =>
@@ -56,7 +66,7 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<BPMChangeValue>(v =>
         {
-            _InputField.text = v.BPM.ToString();
+            _BPM.text = v.BPM.ToString();
             Debug.Log(v);
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
     }

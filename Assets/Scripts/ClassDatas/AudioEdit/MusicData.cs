@@ -2,6 +2,8 @@
 {
     public class MusicData
     {
-        public string PathData;//路径信息
+        public float PreAdventVolume = 1f;
+        public float SucceedVolume = 1f;
+        public float LoseVolume = 1f;
     }
 }

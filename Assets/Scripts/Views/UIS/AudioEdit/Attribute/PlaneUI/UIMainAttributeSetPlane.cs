@@ -1,4 +1,5 @@
 ﻿
+using Assets.Scripts.Querys.AudioEdit;
 using Qf.Commands.AudioEdit;
 using Qf.Events;
 using Qf.Models.AudioEdit;
@@ -18,6 +19,8 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
     UIValueAttribute TipOffset;//偏移量
     [SerializeField]
     UIValueAttribute TimeOfExistence;//鼓点存在时间
+    [SerializeField]
+    UIFileAttribute[] InteractionEvents;
     AudioEditModel editModel;
     private void OnEnable()
     {
@@ -47,9 +50,9 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
             this.SendCommand(new SetAudioEditAudioLoseAudioCommand((AudioClip)v));
             LoseAudio.SetShowFileName(((AudioClip)v).name);
         });
-        TipOffset.SetAction(v => 
+        TipOffset.SetAction(v =>
         {
-            if(!v.Equals(""))
+            if (!v.Equals(""))
                 editModel.TipOffset.Value = float.Parse((string)v);
             else
                 editModel.TipOffset.Value = 0;
@@ -69,31 +72,47 @@ public class UIMainAttributeSetPlane : MonoBehaviour, IController
         {
             TimeOfExistence.SetValueShow(v.ToString());
         }).UnRegisterWhenDisabled(gameObject);
+        int index = 0;
+        foreach (var i in InteractionEvents)//上下左右单击
+        {
+            int ls = index;
+            i.SetAction(v =>
+            {
+                
+                this.SendCommand(new SetAudioEditAudioComeTipsCommand((TheTypeOfOperation)ls, (AudioClip)v));
+                i.SetShowFileName(((AudioClip)v).name);
+            });
+            index++;
+        }
         this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v =>
         {
             UpdateAll();
         }).UnRegisterWhenDisabled(gameObject);
+
     }
     void UpdateAll()
     {
-
-        if (editModel.EditAudioClip != null)
-            MainAudio.SetShowFileName(editModel.EditAudioClip.name);
-        if (editModel.SucceedAudioClip != null)
-            SucceedAudio.SetShowFileName(editModel.SucceedAudioClip.name);
-        if (editModel.LoseAudioClip != null)
-            LoseAudio.SetShowFileName(editModel.LoseAudioClip.name);
+        MainAudio.SetShowFileName(editModel?.EditAudioClip?.name);
+        SucceedAudio.SetShowFileName(editModel?.SucceedAudioClip?.name);
+        LoseAudio.SetShowFileName(editModel?.LoseAudioClip?.name);
+        int index = 0;
+        foreach (var i in InteractionEvents)
+        {
+            i.SetShowFileName(this.SendQuery(new QueryAudioEditComeTipAudio((TheTypeOfOperation)index))?.name);
+            index++;
+        }
         TipOffset.SetValueShow(editModel.TipOffset.ToString());
         TimeOfExistence.SetValueShow(editModel.TimeOfExistence.ToString());
     }
     public void UpdateAllData()
     {
-        foreach(var i in editModel.TimeLineData.Keys)
+        foreach (var i in editModel.TimeLineData.Keys)
         {
-            foreach(var j in editModel.TimeLineData[i])
+            foreach (var j in editModel.TimeLineData[i])
             {
                 j.DrwmsData.SucceedAudioClipPath = editModel.SucceedAudioClip.name;
                 j.DrwmsData.LoseAudioClipPath = editModel.LoseAudioClip.name;
+                j.DrwmsData.PreAdventAudioClipPath = this.SendQuery(new QueryAudioEditComeTipAudio(j.DrwmsData.theTypeOfOperation)).name;
                 j.DrwmsData.PreAdventAudioClipOffsetTime = editModel.TipOffset.Value;
                 j.DrwmsData.TimeOfExistence = editModel.TimeOfExistence.Value;
             }

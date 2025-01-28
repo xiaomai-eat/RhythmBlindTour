@@ -1,3 +1,4 @@
+using Assets.Scripts.Querys.AudioEdit;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Commands.AudioEdit;
 using Qf.Events;
@@ -65,8 +66,8 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
             {
                 DrwmsData = new()
                 {
-                    PreAdventAudioClipPath = "…œªÆ",
                     theTypeOfOperation = theTypeOfOperation,
+                    PreAdventAudioClipPath = this.SendQuery(new QueryAudioEditComeTipAudio(theTypeOfOperation)).name,
                     SucceedAudioClipPath = editModel.SucceedAudioClip.name,
                     LoseAudioClipPath = editModel.LoseAudioClip.name,
                     PreAdventAudioClipOffsetTime = editModel.TipOffset.Value,

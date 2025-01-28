@@ -25,10 +25,10 @@ public class CreateDrumsManager : ManagerBase
         CreateSetClass.Instance = new CreateSetClass(audioSource);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
-            Debug.Log(v.ThisTime);
             if (editModel.TipsAudio.ContainsKey(v.ThisTime))
             {
-                AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray());
+                if (editModel.Mode.Equals(SystemModeData.PlayMode))
+                    AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray(), editModel.TipsVolume[v.ThisTime].ToArray());
             }
             if (editModel.TimeLineData.ContainsKey(v.ThisTime))
             {
@@ -71,6 +71,7 @@ public class CreateDrumsManager : ManagerBase
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
         mode.DrwmsData = drumsLoadData;
+        mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.PreAdventAudioClipPath);
         mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.LoseAudioClipPath);
         mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.SucceedAudioClipPath);
         CreateSetClass.Instance.SetInputMode(mode);

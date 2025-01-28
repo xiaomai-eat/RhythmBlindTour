@@ -20,8 +20,10 @@ namespace Qf.Models
       
         List<AudioClip> GetResourceAudioClipData()
         {
-            AudioClip[] ls = Resources.LoadAll<AudioClip>("Audios");
-            return ls.ToList();
+            List<AudioClip> AllAudio = new();
+            List<AudioClip> ls = Resources.LoadAll<AudioClip>("Audios").ToList();
+            AllAudio.AddRange(ls);
+            return AllAudio;
         }
         public AudioClip GetAudioClip(string Name)
         {

@@ -1,4 +1,5 @@
 using Qf.ClassDatas.AudioEdit;
+using Qf.Events;
 using Qf.Managers;
 using Qf.Models.AudioEdit;
 using Qf.Systems;
@@ -9,7 +10,7 @@ using UnityEngine;
 public class InputMode : MonoBehaviour, IController
 {
     [SerializeField]
-    TheTypeOfOperation operation;
+    TheTypeOfOperation Operation;
     AudioEditModel editModel;
     DrumsLoadData drwmsData = new();//¹ÄµãÊý¾Ý
     public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
@@ -58,7 +59,7 @@ public class InputMode : MonoBehaviour, IController
     }
     void InputRun()
     {
-        switch (operation)
+        switch (Operation)
         {
             case TheTypeOfOperation.SwipeUp:
                 SwipeUp();
@@ -136,18 +137,27 @@ public class InputMode : MonoBehaviour, IController
     }
     void Succeed()
     {
-        AudioEditManager.Instance.Play(_SucceedClip);
+        if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip },new float[] { drwmsData.MusicData.SucceedVolume });
+        this.SendEvent<SucceedTrigger>();
         Destroy(gameObject);
     }
     void Lose()
     {
-        AudioEditManager.Instance.Play(_LoseClip);
+        if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+        AudioEditManager.Instance.Play(new AudioClip[]{ _LoseClip}, new float[] { drwmsData.MusicData.LoseVolume });
+        this.SendEvent<LoseTrigger>();
         Destroy(gameObject);
     }
     public void SetOperation(TheTypeOfOperation theTypeOfOperation)
     {
-        operation = theTypeOfOperation;
+        Operation = theTypeOfOperation;
     }
+    public TheTypeOfOperation GetOperation()
+    {
+        return Operation;
+    }
+
 
     public IArchitecture GetArchitecture()
     {
