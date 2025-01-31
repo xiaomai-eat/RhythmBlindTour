@@ -26,6 +26,6 @@ public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
     /// </summary>
     public void ShowData()
     {
-        Debug.Log("时间轴中的数据");
+
     }
 }

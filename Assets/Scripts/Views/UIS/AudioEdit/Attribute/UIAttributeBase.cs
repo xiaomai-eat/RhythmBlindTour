@@ -9,7 +9,6 @@ public class UIAttributeBase : MonoBehaviour,IController
 {
     [SerializeField]
     TMP_Text _Name;//属性名称
-    [SerializeField]
     ParameterType _ParameterType;//参数类型
     Action<object> action;
     public void SetAction(Action<object> action)
@@ -20,6 +19,10 @@ public class UIAttributeBase : MonoBehaviour,IController
     {
         action?.Invoke(value);
     }
+    /// <summary>
+    /// 设置显示的名称
+    /// </summary>
+    /// <param name="Name"></param>
     public void SetName(string Name)
     {
         _Name.text = Name;
@@ -28,7 +31,10 @@ public class UIAttributeBase : MonoBehaviour,IController
     {
         return _ParameterType;
     }
-
+    public void SetParameterType(ParameterType parameterType)
+    {
+        _ParameterType = parameterType;
+    }
     public IArchitecture GetArchitecture()
     {
         return GameBody.Interface;
@@ -39,6 +45,8 @@ public class UIAttributeBase : MonoBehaviour,IController
 /// </summary>
 public enum ParameterType
 {
+    Drop,
     Value,
     File,
+    Slider
 }

@@ -34,10 +34,10 @@ public class CreateDrumsManager : ManagerBase
             {
                 foreach (var i in editModel.TimeLineData[v.ThisTime])
                 {
-                    gameObjects.Add(CreateDrums(i.DrwmsData.theTypeOfOperation, default, i).GetInputMode());
+                    gameObjects.Add(CreateDrums(i.DrwmsData.DtheTypeOfOperation, i).GetInputMode());
                 }
             }
-            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))
+            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))//Bug:在区间的时候返回会额外生成(不影响正常游玩时的效果)
             {
                 List<InputMode> ls = new();
                 foreach (var j in gameObjects)
@@ -66,19 +66,20 @@ public class CreateDrumsManager : ManagerBase
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="vector3"></param>
-    public CreateSetClass CreateDrums(TheTypeOfOperation operation, Vector3 vector3 = default, DrumsLoadData drumsLoadData = null)
+    public CreateSetClass CreateDrums(TheTypeOfOperation operation, DrumsLoadData drumsLoadData = null)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
         mode.DrwmsData = drumsLoadData;
-        mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.PreAdventAudioClipPath);
-        mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.LoseAudioClipPath);
-        mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.SucceedAudioClipPath);
+        mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FPreAdventAudioClipPath);
+        mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FLoseAudioClipPath);
+        mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FSucceedAudioClipPath);
         CreateSetClass.Instance.SetInputMode(mode);
         mode.SetOperation(operation);
-        if (vector3.Equals(default))
-            mode.transform.position = new Vector3(0, 0, 0);
-        // gameObject.transform.position = vector3;
+        this.SendEvent(new DrumsGenerate()
+        {
+            InputMode = mode
+        });
         return CreateSetClass.Instance;
     }
 
@@ -139,7 +140,7 @@ public class CreateDrumsManager : ManagerBase
         {
             if (Clip != null)
                 _Mode.PreAdventClip = Clip;
-            _Mode.DrwmsData.DrwmsData.PreAdventAudioClipOffsetTime = DelayTime;
+            _Mode.DrwmsData.DrwmsData.VPreAdventAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
         /// <summary>

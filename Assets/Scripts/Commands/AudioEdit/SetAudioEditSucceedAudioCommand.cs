@@ -9,14 +9,33 @@ namespace Qf.Commands.AudioEdit
     {
         AudioEditModel editModel;
         AudioClip audioClip;
-        public SetAudioEditSucceedAudioCommand(AudioClip value)
+        TheTypeOfOperation TheTypeOfOperation;
+        public SetAudioEditSucceedAudioCommand(TheTypeOfOperation theTypeOfOperation,AudioClip value)
         {
+            TheTypeOfOperation = theTypeOfOperation;
             audioClip = value;
         }
         protected override void OnExecute()
         {
             editModel = this.GetModel<AudioEditModel>();
-            editModel.SucceedAudioClip = audioClip;
+            switch (TheTypeOfOperation)
+            {
+                case TheTypeOfOperation.SwipeUp:
+                    editModel.UpSucceedAudioClip = audioClip;
+                    break;
+                case TheTypeOfOperation.SwipeDown:
+                    editModel.DownSucceedAudioClip = audioClip;
+                    break;
+                case TheTypeOfOperation.SwipeRight:
+                    editModel.RigthSucceedAudioClip = audioClip;
+                    break;
+                case TheTypeOfOperation.SwipeLeft:
+                    editModel.LeftSucceedAudioClip = audioClip;
+                    break;
+                case TheTypeOfOperation.Click:
+                    editModel.ClickSucceedAudioClip = audioClip;
+                    break;
+            }
         }
     }
 }

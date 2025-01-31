@@ -25,7 +25,7 @@ namespace Qf.Managers {
         }
         public void Test2()
         {
-            UIManager.instance.Show<UIAudioEditShowAllTimePlane>(null);
+            UIManager.instance.Show<UIAudioEditShowAllTimePanel>(null);
         }
         void Update() => _UpDate?.Invoke();
 

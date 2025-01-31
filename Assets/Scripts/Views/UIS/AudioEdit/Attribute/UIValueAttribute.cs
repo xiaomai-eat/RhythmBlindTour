@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class UIValueAttribute : UIAttributeBase, IPointerClickHandler
 {
@@ -11,6 +12,7 @@ public class UIValueAttribute : UIAttributeBase, IPointerClickHandler
     TMP_InputField inputField;
     private void Start()
     {
+        SetParameterType(ParameterType.Value);
         inputField.onValueChanged.AddListener(v =>
         {
             RunAction(v);
@@ -18,7 +20,8 @@ public class UIValueAttribute : UIAttributeBase, IPointerClickHandler
     }
     public void SetValueShow(string Value)
     {
-        inputField.text = Value;
+        if(inputField != null)
+            inputField.text = Value;
     }
     public void OnPointerClick(PointerEventData eventData)
     {

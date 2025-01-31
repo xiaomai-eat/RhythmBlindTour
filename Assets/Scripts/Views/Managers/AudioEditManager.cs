@@ -35,11 +35,17 @@ namespace Qf.Managers
         public void Play(AudioClip[] audioClip,float[] volume =null)
         {
             int startindex = index;
-            foreach(var i in volume)
+            for(int i= 0;i< audioClip.Length;i++)
             {
-                vfxSource[startindex].volume = i;
+                if (i >= volume.Length) 
+                    vfxSource[startindex].volume = 1;
+                else
+                {
+                    vfxSource[startindex].volume = volume[i];
+                }
+                    
                 startindex++;
-                if (startindex >= volume.Length)
+                if (startindex >= vfxSource.Count)
                     startindex = 0;
             }
             foreach (var i in audioClip)
@@ -47,10 +53,19 @@ namespace Qf.Managers
                 vfxSource[index].clip = i;
                 vfxSource[index].Play();
                 index++;
+
                 if (index >= vfxSource.Count)
                     index = 0;
-                vfxSource[index].volume = 1;
             }
+        }
+        public void Play(AudioClip audioClip, float volume = 1)
+        {
+            vfxSource[index].volume = volume;
+            vfxSource[index].clip = audioClip;
+            vfxSource[index].Play();
+            index++;
+            if (index >= vfxSource.Count)
+                index = 0;
         }
         public async void OnePlay(AudioClip audioClip)
         {
@@ -184,6 +199,7 @@ namespace Qf.Managers
         void PlayMode()
         {
             UpdateData();
+            audioSource.volume = editModel.EditAudioClipVolume.Value;
             audioSource.Play();
         }
         void ExitPlayMode()

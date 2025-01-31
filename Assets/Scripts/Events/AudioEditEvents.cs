@@ -32,6 +32,9 @@ namespace Qf.Events
     public struct OnUpdateThisTime {
         public float ThisTime;
     };
+    /// <summary>
+    /// 初始化当前时间
+    /// </summary>
     public struct OnStartThisTime
     {
         public float ThisTime;

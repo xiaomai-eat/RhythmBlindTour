@@ -38,12 +38,12 @@ public class InputMode : MonoBehaviour, IController
     {
         editModel = this.GetModel<AudioEditModel>();
         StartTime = editModel.ThisTime;
-        if (editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence > editModel.EditAudioClip.length)
+        if (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence > editModel.EditAudioClip.length)
         {
-            EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence) - editModel.EditAudioClip.length);
+            EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence) - editModel.EditAudioClip.length);
             return;
         }
-        EndTime = editModel.ThisTime + drwmsData.DrwmsData.TimeOfExistence;
+        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence;
     }
     void Start()
     {
@@ -53,7 +53,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
         TimeOfExistence += Time.deltaTime;
-        if (TimeOfExistence >= drwmsData.DrwmsData.TimeOfExistence)
+        if (TimeOfExistence >= drwmsData.DrwmsData.VTimeOfExistence)
             Lose();
         InputRun();
     }
@@ -138,14 +138,14 @@ public class InputMode : MonoBehaviour, IController
     void Succeed()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip },new float[] { drwmsData.MusicData.SucceedVolume });
+        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip },new float[] { drwmsData.MusicData.SSucceedVolume });
         this.SendEvent<SucceedTrigger>();
         Destroy(gameObject);
     }
     void Lose()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[]{ _LoseClip}, new float[] { drwmsData.MusicData.LoseVolume });
+        AudioEditManager.Instance.Play(new AudioClip[]{ _LoseClip}, new float[] { drwmsData.MusicData.SLoseVolume });
         this.SendEvent<LoseTrigger>();
         Destroy(gameObject);
     }

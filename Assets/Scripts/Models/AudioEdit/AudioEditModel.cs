@@ -15,7 +15,15 @@ namespace Qf.Models.AudioEdit
     {
         public SystemModeData Mode = SystemModeData.EditMode;//模式
         public AudioClip EditAudioClip;//编辑的音频
-        public AudioClip SucceedAudioClip;//交互成功的音频
+        public BindableProperty<float> EditAudioClipVolume =new(1);
+        public BindableProperty<float> PreAdventVolume = new(1);
+        public BindableProperty<float> SucceedAudioVolume = new(1);
+        public BindableProperty<float> LoseAudioVolume = new(1);
+        public AudioClip DownSucceedAudioClip;//交互成功的音频
+        public AudioClip UpSucceedAudioClip;
+        public AudioClip LeftSucceedAudioClip;
+        public AudioClip RigthSucceedAudioClip;
+        public AudioClip ClickSucceedAudioClip;
         public AudioClip LoseAudioClip;//交互失败的音频
         public AudioClip DownTipsAudioClip;
         public AudioClip UpTipsAudioClip;
@@ -48,9 +56,10 @@ namespace Qf.Models.AudioEdit
             {
                 foreach (var j in TimeLineData[i])
                 {
-                    if (i - j.DrwmsData.PreAdventAudioClipOffsetTime >= 0)
+                    if (j.DrwmsData == null) continue;
+                    if (i - j.DrwmsData.VPreAdventAudioClipOffsetTime >= 0)
                     {
-                        ls = (float)Math.Round(i - j.DrwmsData.PreAdventAudioClipOffsetTime, 2, MidpointRounding.ToEven);
+                        ls = (float)Math.Round(i - j.DrwmsData.VPreAdventAudioClipOffsetTime, 2, MidpointRounding.ToEven);
                         if (!TipsAudio.ContainsKey(ls))
                         {
                             TipsAudio.Add(ls, new());
@@ -58,14 +67,14 @@ namespace Qf.Models.AudioEdit
                         }
                         if (TipsAudio.ContainsKey(ls))
                         {
-                            TipsAudio[ls].Add(this.GetModel<DataCachingModel>().GetAudioClip(j.DrwmsData.PreAdventAudioClipPath));
-                            TipsVolume[ls].Add(j.MusicData.PreAdventVolume);
+                            TipsAudio[ls].Add(this.GetModel<DataCachingModel>().GetAudioClip(j.DrwmsData.FPreAdventAudioClipPath));
+                            TipsVolume[ls].Add(j.MusicData.SPreAdventVolume);
                         }
 
                     }
                     else
                     {
-                        ls = (float)Math.Round(j.DrwmsData.PreAdventAudioClipOffsetTime, 2, MidpointRounding.ToEven);
+                        ls = (float)Math.Round(j.DrwmsData.VPreAdventAudioClipOffsetTime, 2, MidpointRounding.ToEven);
                         if (!TipsAudio.ContainsKey(ls)) 
                         { 
                             TipsAudio.Add(ls, new());
@@ -74,8 +83,8 @@ namespace Qf.Models.AudioEdit
 
                         if (TipsAudio.ContainsKey(ls))
                         {
-                            TipsAudio[ls].Add(this.GetModel<DataCachingModel>().GetAudioClip(j.DrwmsData.PreAdventAudioClipPath));
-                            TipsVolume[ls].Add(j.MusicData.PreAdventVolume);
+                            TipsAudio[ls].Add(this.GetModel<DataCachingModel>().GetAudioClip(j.DrwmsData.FPreAdventAudioClipPath));
+                            TipsVolume[ls].Add(j.MusicData.SPreAdventVolume);
                         }
 
                     }
@@ -88,8 +97,13 @@ namespace Qf.Models.AudioEdit
             if (Path.Equals("")) return;
             AudioSaveData audioSaveData = this.GetUtility<Storage>().Load<AudioSaveData>(Path, true);
             DataCachingModel s = this.GetModel<DataCachingModel>();
+            EditAudioClipVolume.Value = audioSaveData.EditAudioClipVolume;
             this.SendCommand(new SetAudioEditAudioCommand(this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.EditAudioClip))));
-            this.SendCommand(new SetAudioEditSucceedAudioCommand(this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.SucceedAudioClip))));
+            this.SendCommand(new SetAudioEditSucceedAudioCommand(TheTypeOfOperation.SwipeDown,this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.DownSucceedAudioClip))));
+            this.SendCommand(new SetAudioEditSucceedAudioCommand(TheTypeOfOperation.SwipeUp, this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.UpSucceedAudioClip))));
+            this.SendCommand(new SetAudioEditSucceedAudioCommand(TheTypeOfOperation.SwipeLeft, this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.LeftSucceedAudioClip))));
+            this.SendCommand(new SetAudioEditSucceedAudioCommand(TheTypeOfOperation.SwipeRight, this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.RigthSucceedAudioClip))));
+            this.SendCommand(new SetAudioEditSucceedAudioCommand(TheTypeOfOperation.Click, this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.ClickSucceedAudioClip))));
             this.SendCommand(new SetAudioEditAudioLoseAudioCommand(this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.LoseAudioClip))));
             UpTipsAudioClip = this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.UpTipsAudioClip));
             DownTipsAudioClip = this.SendQuery(new QueryAudioEditLoadAudio(audioSaveData.DownTipsAudioClip));
@@ -100,7 +114,7 @@ namespace Qf.Models.AudioEdit
             this.SendCommand(new SetAudioEditThisTimeCommand(audioSaveData.ThisTime));
             TimeLineData = audioSaveData.TimeLineData;
             this.SendEvent<OnUpdateAudioEditDrumsUI>();
-
+            this.SendEvent<AudioEditModelLoad>();
         }
         public void Save()
         {
@@ -108,7 +122,12 @@ namespace Qf.Models.AudioEdit
             if (Path.Equals("")) return;
             AudioSaveData audioSaveData = new AudioSaveData();
             audioSaveData.EditAudioClip = EditAudioClip.name;
-            audioSaveData.SucceedAudioClip = SucceedAudioClip.name;
+            audioSaveData.EditAudioClipVolume = EditAudioClipVolume.Value;
+            audioSaveData.DownSucceedAudioClip = DownSucceedAudioClip.name;
+            audioSaveData.UpSucceedAudioClip = UpSucceedAudioClip.name;
+            audioSaveData.LeftSucceedAudioClip = LeftSucceedAudioClip.name;
+            audioSaveData.RigthSucceedAudioClip = RightTipsAudioClip.name;
+            audioSaveData.ClickSucceedAudioClip = ClickSucceedAudioClip.name;
             audioSaveData.LoseAudioClip = LoseAudioClip.name;
             audioSaveData.DownTipsAudioClip = DownTipsAudioClip.name;
             audioSaveData.UpTipsAudioClip = UpTipsAudioClip.name;
@@ -125,7 +144,12 @@ namespace Qf.Models.AudioEdit
     public class AudioSaveData
     {
         public string EditAudioClip;
-        public string SucceedAudioClip;
+        public float EditAudioClipVolume;
+        public string DownSucceedAudioClip;//交互成功的音频
+        public string UpSucceedAudioClip;
+        public string LeftSucceedAudioClip;
+        public string RigthSucceedAudioClip;
+        public string ClickSucceedAudioClip;
         public string LoseAudioClip;
         public string DownTipsAudioClip;
         public string UpTipsAudioClip;

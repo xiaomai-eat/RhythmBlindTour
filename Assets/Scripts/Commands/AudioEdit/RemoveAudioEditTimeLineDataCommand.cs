@@ -47,7 +47,7 @@ namespace Qf.Commands.AudioEdit
             if (model.TimeLineData.ContainsKey(time))
             {
                 if (model.TimeLineData[time].Count>index)
-                    model.TimeLineData[time][index] = null;
+                    model.TimeLineData[time].Remove(model.TimeLineData[time][index]);
             }
             this.SendEvent<OnUpdateAudioEditDrumsUI>();
         }

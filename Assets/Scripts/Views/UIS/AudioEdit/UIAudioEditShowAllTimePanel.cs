@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-public class UIAudioEditShowAllTimePlane :UIWindowBase
+public class UIAudioEditShowAllTimePanel :UIWindowBase
 {
     [SerializeField]
     GameObject _UITimeShowButtonProfabs;

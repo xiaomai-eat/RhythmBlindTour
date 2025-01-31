@@ -2,8 +2,8 @@
 {
     public class MusicData
     {
-        public float PreAdventVolume = 1f;
-        public float SucceedVolume = 1f;
-        public float LoseVolume = 1f;
+        public float SPreAdventVolume = 1f;
+        public float SSucceedVolume = 1f;
+        public float SLoseVolume = 1f;
     }
 }

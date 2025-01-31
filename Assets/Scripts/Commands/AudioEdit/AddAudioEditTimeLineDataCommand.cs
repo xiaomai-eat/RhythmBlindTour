@@ -43,11 +43,13 @@ namespace Qf.Commands.AudioEdit
                     Debug.LogError("[AddEditAudioTimeLineDataCommand] 当前时间节点鼓点已满");
                     return;
                 }
+                value.Name = $"{time}[{Count+1}]";
                 AudioEditModel.TimeLineData[time].Add(value);
             }
             else
             {
                 AudioEditModel.TimeLineData.Add(time, new List<DrumsLoadData>());
+                value.Name = $"{time}[{Count + 1}]";
                 AudioEditModel.TimeLineData[time].Add(value);
             }
             this.SendEvent<OnUpdateAudioEditDrumsUI>();

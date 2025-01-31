@@ -10,6 +10,10 @@ public class UIFileAttribute : UIAttributeBase, IPointerClickHandler
 {
     [SerializeField]
     TMP_Text ShowFileName;
+    private void Start()
+    {
+        SetParameterType(ParameterType.File);
+    }
     public void SetShowFileName(string Name)
     {
         ShowFileName.text = Name;

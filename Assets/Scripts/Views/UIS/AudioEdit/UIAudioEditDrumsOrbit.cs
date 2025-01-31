@@ -7,7 +7,6 @@ using Qf.Querys.AudioEdit;
 using Qf.Systems;
 using QFramework;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
@@ -60,20 +59,28 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
     }
     public void AddDrwms(TheTypeOfOperation theTypeOfOperation)
     {
+        if (editModel.EditAudioClip == null) return;
         this.SendCommand(new AddAudioEditTimeLineDataCommand(
             editModel.ThisTime,
             new DrumsLoadData()
             {
                 DrwmsData = new()
                 {
-                    theTypeOfOperation = theTypeOfOperation,
-                    PreAdventAudioClipPath = this.SendQuery(new QueryAudioEditComeTipAudio(theTypeOfOperation)).name,
-                    SucceedAudioClipPath = editModel.SucceedAudioClip.name,
-                    LoseAudioClipPath = editModel.LoseAudioClip.name,
-                    PreAdventAudioClipOffsetTime = editModel.TipOffset.Value,
-                    TimeOfExistence = editModel.TimeOfExistence.Value
+                    DtheTypeOfOperation = theTypeOfOperation,
+                    FPreAdventAudioClipPath = this.SendQuery(new QueryAudioEditComeTipAudio(theTypeOfOperation)).name,
+                    FSucceedAudioClipPath = editModel.DownSucceedAudioClip.name,
+                    FLoseAudioClipPath = editModel.LoseAudioClip.name,
+                    VPreAdventAudioClipOffsetTime = editModel.TipOffset.Value,
+                    VTimeOfExistence = editModel.TimeOfExistence.Value
+                },
+                MusicData = new()
+                {
+                    SPreAdventVolume = editModel.PreAdventVolume.Value,
+                    SLoseVolume = editModel.LoseAudioVolume.Value,
+                    SSucceedVolume = editModel.SucceedAudioVolume.Value
                 }
             }));
+
     }
 
     public void RemoveDrwms(int index = -1)
@@ -119,12 +126,13 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour,IController
             go = null;
             for (int i=0; i<a[item].Count;i++)
             {
+                if (a[item][i] == null) continue;
                 go = Instantiate(DrumsProfabs).transform;
                 go.SetParent(DrumsUI[i].transform);
                 gorecttransform = go.GetComponent<RectTransform>();
                 go.transform.position = new Vector3(transform.position.x, DrumsUI[i].transform.position.y- (_EditHeight / DrumsUI.Length/2),transform.position.z);
                 gorecttransform.anchoredPosition = new Vector2(item * _PixelUnitsPerSecond, gorecttransform.anchoredPosition.y);
-                gorecttransform.sizeDelta = new Vector2(a[item][i].DrwmsData.TimeOfExistence* gorecttransform.sizeDelta.x , gorecttransform.sizeDelta.y);
+                gorecttransform.sizeDelta = new Vector2(a[item][i].DrwmsData.VTimeOfExistence* gorecttransform.sizeDelta.x , gorecttransform.sizeDelta.y);
                 uiDrums = go.GetComponent<UIAudioEditDrums>();
                 uiDrums.SetColor(new Color(Random.Range(0,101)/(float)100,Random.Range(0, 101) / (float)100, Random.Range(0, 101) / (float)100, 1));
                 uiDrums.ThisTime = item;
