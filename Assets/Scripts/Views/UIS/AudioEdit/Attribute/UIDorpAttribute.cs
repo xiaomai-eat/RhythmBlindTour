@@ -11,13 +11,17 @@ public class UIDorpAttribute : UIAttributeBase, IPointerClickHandler
     private void Start()
     {
         SetParameterType(ParameterType.Drop);
+        Dropdown.onValueChanged.AddListener(v =>
+        {
+            RunAction(v);
+        });
     }
     public void SetDropdownVlaue<T>(T Value) where T:Enum//用于不同枚举的显示
     {
     }
     public void SetDropdownVlaue(TheTypeOfOperation theTypeOfOperation)//默认
     {
-        TheTypeOfOperation = theTypeOfOperation;
+        Dropdown.value = (int)theTypeOfOperation;
     }
     public TheTypeOfOperation GetDropdownVlaue()//默认
     {

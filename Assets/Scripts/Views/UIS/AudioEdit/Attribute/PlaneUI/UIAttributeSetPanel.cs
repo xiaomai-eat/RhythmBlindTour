@@ -86,6 +86,8 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
                 else
                 {
                     UpdateName("当前时间节点无鼓点");
+                    UpButton.gameObject.SetActive(false);
+                    DownButton.gameObject.SetActive(false);
                     Show(false);
                 }
                     
@@ -153,6 +155,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 ls.DrwmsData.FPreAdventAudioClipPath = ((AudioClip)v).name;
                 PreAdventAudio.SetShowFileName(ls.DrwmsData.FPreAdventAudioClipPath);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
             });
             SucceedAudio.SetAction(v =>
             {
@@ -168,7 +171,6 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 ls.MusicData.SPreAdventVolume = (float)v;
                 PreAdventAudioVolum.SetValueShow(ls.MusicData.SPreAdventVolume);
-                this.SendEvent<OnUpdateAudioEditDrumsUI>();
             });
             SucceedAudioVolum.SetAction(v =>
             {
