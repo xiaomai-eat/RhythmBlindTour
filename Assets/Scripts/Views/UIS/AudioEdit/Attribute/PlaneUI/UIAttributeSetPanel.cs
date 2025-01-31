@@ -82,7 +82,24 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
                     index = editModel.TimeLineData[editModel.ThisTime].Count-1;
                 }
                 if (editModel.TimeLineData[editModel.ThisTime].Count != 0)
+                {
+                    if(index == 0)
+                    {
+                        UpButton.gameObject.SetActive(false);
+                        DownButton.gameObject.SetActive(true);
+                    }
+                    else if(index == editModel.TimeLineData[editModel.ThisTime].Count-1)
+                    {
+                        UpButton.gameObject.SetActive(true);
+                        DownButton.gameObject.SetActive(false);
+                    }
+                    else
+                    {
+                        UpButton.gameObject.SetActive(true);
+                        DownButton.gameObject.SetActive(true);
+                    }
                     UpdateData(index);
+                }
                 else
                 {
                     UpdateName("当前时间节点无鼓点");
