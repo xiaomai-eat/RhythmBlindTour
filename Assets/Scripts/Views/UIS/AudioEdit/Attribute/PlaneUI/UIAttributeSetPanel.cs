@@ -251,6 +251,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
         }
         if (editModel.TimeLineData.ContainsKey(thisTime))
         {
+            if (editModel.TimeLineData[thisTime].Count >= index) return;
             Name.text = editModel.TimeLineData[thisTime][index].Name;
         }
         else
