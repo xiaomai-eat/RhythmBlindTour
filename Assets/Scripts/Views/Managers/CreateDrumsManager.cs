@@ -9,7 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 /// <summary>
-/// 该类是用于管理鼓点实体的(可通过链式方法去设置鼓点数据)
+/// ????????????????????(????????????????锟斤拷??????)
 /// </summary>
 public class CreateDrumsManager : ManagerBase
 {
@@ -37,7 +37,7 @@ public class CreateDrumsManager : ManagerBase
                     gameObjects.Add(CreateDrums(i.DrwmsData.DtheTypeOfOperation, i).GetInputMode());
                 }
             }
-            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))//Bug:在区间的时候返回会额外生成(不影响正常游玩时的效果)
+            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))//Bug:???????????????????(????????????????锟斤拷??)
             {
                 List<InputMode> ls = new();
                 foreach (var j in gameObjects)
@@ -51,18 +51,18 @@ public class CreateDrumsManager : ManagerBase
                         }
                     }
                 }
-                foreach(var e in ls)
+                foreach (var e in ls)
                 {
                     gameObjects.Remove(e);
                 }
             }
-            
+
 
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
-        Debug.Log("CreateDrumsManager 已加载...");
+        Debug.Log("CreateDrumsManager ?????...");
     }
     /// <summary>
-    /// 添加鼓点实体
+    /// ?????????
     /// </summary>
     /// <param name="operation"></param>
     /// <param name="vector3"></param>
@@ -108,7 +108,7 @@ public class CreateDrumsManager : ManagerBase
             }
         }
         /// <summary>
-        /// 设置被影响的InputMode
+        /// ?????????InputMode
         /// </summary>
         /// <param name="inputMode"></param>
         public void SetInputMode(InputMode inputMode)
@@ -125,7 +125,7 @@ public class CreateDrumsManager : ManagerBase
             return _Mode;
         }
         /// <summary>
-        /// 设置触发成功音效(音效及延迟时间)
+        /// ????????????锟斤拷(??锟斤拷????????)
         /// </summary>
         public void SetSuccessSounds(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
@@ -134,7 +134,7 @@ public class CreateDrumsManager : ManagerBase
             SetCpVector(channelPosition);
         }
         /// <summary>
-        /// 设置来临前音效(音效及延迟时间)
+        /// ???????????锟斤拷(??锟斤拷????????)
         /// </summary>
         public void SetPreAdventSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
@@ -144,7 +144,7 @@ public class CreateDrumsManager : ManagerBase
             SetCpVector(channelPosition);
         }
         /// <summary>
-        /// 设置失败音效(音效及延迟时间)
+        /// ?????????锟斤拷(??锟斤拷????????)
         /// </summary>
         public void SetFailureSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
@@ -171,7 +171,7 @@ public class CreateDrumsManager : ManagerBase
         }
     }
 
-    public enum ChannelPosition //声道位置
+    public enum ChannelPosition //????锟斤拷??
     {
         LeftChannel,
         RightChannel,

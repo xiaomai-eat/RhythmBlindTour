@@ -17,8 +17,8 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     TMP_Text ShowTimes;
     [SerializeField]
     ScrollRect ScrollRect;
-    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//Ã¿ÃëÏñËØµ¥Î»
-    int _EditHeight = AudioEditConfig.EditHeight;//±à¼­Æ÷¿É±à¼­·¶Î§¸ß¶È
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//Ã¿ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½Î»
+    int _EditHeight = AudioEditConfig.EditHeight;//ï¿½à¼­ï¿½ï¿½ï¿½É±à¼­ï¿½ï¿½Î§ï¿½ß¶ï¿½
     public Vector2 TimeHandPos
     {
         get
@@ -52,12 +52,12 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
         TimeHand.anchoredPosition = new Vector2(newTime * _PixelUnitsPerSecond, 0);
         ShowTimes.text = newTime.ToString("0.00");
     }
-    int mode = 0;//ÕâÀïµÄÄ£Ê½Ö¸:Ê±¼äÖáµÄÌí¼Ó»òÉ¾³ýÄ£Ê½
+    int mode = 0;//ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½Ö¸:Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó»ï¿½É¾ï¿½ï¿½Ä£Ê½
     float Speed;
     float PressTime;
     private void Update()
     {
-        #region Ä£Ê½ÇÐ»»
+        #region Ä£Ê½ï¿½Ð»ï¿½
         if (mode == 0)
         {
             PressTime = 0;

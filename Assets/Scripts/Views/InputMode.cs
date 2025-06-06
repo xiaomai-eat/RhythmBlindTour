@@ -12,23 +12,23 @@ public class InputMode : MonoBehaviour, IController
     [SerializeField]
     TheTypeOfOperation Operation;
     AudioEditModel editModel;
-    DrumsLoadData drwmsData = new();//¹ÄµãÊý¾Ý
+    DrumsLoadData drwmsData = new();//ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½
     public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     public float StartTime;
     public float EndTime;
     [SerializeField]
-    float TimeOfExistence;//¹Äµã´æÔÚÊ±¼ä
+    float TimeOfExistence;//ï¿½Äµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
     [SerializeField]
-    AudioClip _PreAdventClip;//À´ÁÙÇ°²¥·ÅµÄÒôÆµ
+    AudioClip _PreAdventClip;//ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Åµï¿½ï¿½ï¿½Æµ
     public AudioClip PreAdventClip { get { return _PreAdventClip; } set { _PreAdventClip = value; } }
     [SerializeField]
-    AudioClip _SucceedClip;//³É¹¦Ê±µÄÒôÆµ
+    AudioClip _SucceedClip;//ï¿½É¹ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Æµ
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
     [SerializeField]
-    AudioClip _LoseClip;//Ê§°ÜÊ±µÄÒôÆµ
+    AudioClip _LoseClip;//Ê§ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Æµ
     public AudioClip LoseClip { get { return _LoseClip; } set { _LoseClip = value; } }
     //[SerializeField]
-    //bool isPlay;//ÊÇ·ñ±»µã»÷(ÓÃÓÚ´¦ÀíÍ¬Ê±³öÏÖµÄÇé¿öÄ¿Ç°À´ËµÓÃ²»×Å)
+    //bool isPlay;//ï¿½Ç·ñ±»µï¿½ï¿½(ï¿½ï¿½ï¿½Ú´ï¿½ï¿½ï¿½Í¬Ê±ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½Ä¿Ç°ï¿½ï¿½Ëµï¿½Ã²ï¿½ï¿½ï¿½)
     public SpriteRenderer SpriteRenderer;
     private void OnEnable()
     {
@@ -84,7 +84,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeUp)
         {
-            Debug.Log("ÉÏ»¬");
+            Debug.Log("ï¿½Ï»ï¿½");
             Succeed();
             return;
         }
@@ -95,7 +95,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeDown)
         {
-            Debug.Log("ÏÂ»¬");
+            Debug.Log("ï¿½Â»ï¿½");
             Succeed();
             return;
         }
@@ -106,7 +106,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeLeft)
         {
-            Debug.Log("×ó»¬");
+            Debug.Log("ï¿½ï¿½");
             Succeed();
             return;
         }
@@ -117,7 +117,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeRight)
         {
-            Debug.Log("ÓÒ»¬");
+            Debug.Log("ï¿½Ò»ï¿½");
             Succeed();
             return;
         }
@@ -128,7 +128,7 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.Click)
         {
-            Debug.Log("µã»÷");
+            Debug.Log("ï¿½ï¿½ï¿½");
             Succeed();
             return;
         }
@@ -165,13 +165,17 @@ public class InputMode : MonoBehaviour, IController
     }
 }
 /// <summary>
-/// ½»»¥²Ù×÷
+/// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 /// </summary>
 public enum TheTypeOfOperation
 {
-    SwipeUp,
-    SwipeDown,
-    SwipeRight,
-    SwipeLeft,
-    Click
+  SwipeUp,    
+  SwipeDown,    
+  SwipeLeft,    
+  SwipeRight,
+  Click
+
+  
+
+
 }

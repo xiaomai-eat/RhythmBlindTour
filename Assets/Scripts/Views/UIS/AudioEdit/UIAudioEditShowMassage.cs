@@ -32,6 +32,11 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
     }
     void Start()
     {
+        #region beat setting - mixyao/25/06/06  (ymd)
+        // 监听 A/B 拍号变更
+        _A.onValueChanged.AddListener(v => UpdateBeat());
+        _B.onValueChanged.AddListener(v => UpdateBeat());
+        #endregion
         _GetBPMButton.onClick.AddListener(() =>
         {
             if (AudioEditManager.Instance != null)
@@ -44,16 +49,16 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         });
         this.RegisterEvent<OnEditMode>(v =>
         {
-            _ModeShow.text = "�༭ģʽ";
+            _ModeShow.text = "�༭ģʽ";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnPlayMode>(v =>
         {
-            _ModeShow.text = "����ģʽ";
+            _ModeShow.text = "����ģʽ";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
         this.RegisterEvent<OnRecordingMode>(v =>
         {
-            _ModeShow.text = "¼��ģʽ";
+            _ModeShow.text = "¼��ģʽ";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
@@ -62,7 +67,7 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         this.RegisterEvent<MainAudioChangeValue>(v =>
         {
             _AudioNameShow.text = v.Name;
-           
+
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<BPMChangeValue>(v =>
         {
@@ -74,4 +79,21 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
     {
 
     }
+
+    #region beat setting - mixyao/25/06/06  (ymd)
+    void UpdateBeat()
+    {
+        // 根据 Dropdown 选择更新模型
+        int aValue = _A.value + 1; // A 显示内容是 1~6
+        int[] bOptions = { 1, 2, 4, 8 };
+        int bValue = bOptions[_B.value];
+
+        var model = this.GetModel<AudioEditModel>();
+        model.BeatA = aValue;
+        model.BeatB = bValue;
+
+        this.SendEvent(new BPMChangeValue { BPM = model.BPM }); // 强制触发重绘
+    }
+
+    #endregion
 }

@@ -79,16 +79,16 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 if (editModel.TimeLineData[editModel.ThisTime].Count <= index)
                 {
-                    index = editModel.TimeLineData[editModel.ThisTime].Count-1;
+                    index = editModel.TimeLineData[editModel.ThisTime].Count - 1;
                 }
                 if (editModel.TimeLineData[editModel.ThisTime].Count != 0)
                 {
-                    if(index == 0)
+                    if (index == 0)
                     {
                         UpButton.gameObject.SetActive(false);
                         DownButton.gameObject.SetActive(true);
                     }
-                    else if(index == editModel.TimeLineData[editModel.ThisTime].Count-1)
+                    else if (index == editModel.TimeLineData[editModel.ThisTime].Count - 1)
                     {
                         UpButton.gameObject.SetActive(true);
                         DownButton.gameObject.SetActive(false);
@@ -107,7 +107,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
                     DownButton.gameObject.SetActive(false);
                     Show(false);
                 }
-                    
+
             }
             else
             {
@@ -178,6 +178,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 ls.DrwmsData.FSucceedAudioClipPath = ((AudioClip)v).name;
                 SucceedAudio.SetShowFileName(ls.DrwmsData.FSucceedAudioClipPath);
+                //this.SendEvent<OnUpdateAudioEditDrumsUI>();
             });
             LoseAudioClip.SetAction(v =>
             {
@@ -242,7 +243,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
         thisTime = (float)Math.Round(editModel.ThisTime, 2, MidpointRounding.ToEven);
         this.SendCommand(new RemoveAudioEditTimeLineDataCommand(thisTime, index));
     }
-    public void UpdateName(string str="")
+    public void UpdateName(string str = "")
     {
         if (!str.Equals(""))
         {
