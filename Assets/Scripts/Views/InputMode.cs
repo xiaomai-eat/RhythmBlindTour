@@ -12,24 +12,25 @@ public class InputMode : MonoBehaviour, IController
     [SerializeField]
     TheTypeOfOperation Operation;
     AudioEditModel editModel;
-    DrumsLoadData drwmsData = new();//�ĵ�����
+    DrumsLoadData drwmsData = new();
     public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     public float StartTime;
     public float EndTime;
     [SerializeField]
-    float TimeOfExistence;//�ĵ����ʱ��
+    float TimeOfExistence;
     [SerializeField]
-    AudioClip _PreAdventClip;//����ǰ���ŵ���Ƶ
+    AudioClip _PreAdventClip;
     public AudioClip PreAdventClip { get { return _PreAdventClip; } set { _PreAdventClip = value; } }
     [SerializeField]
-    AudioClip _SucceedClip;//�ɹ�ʱ����Ƶ
+    AudioClip _SucceedClip;
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
     [SerializeField]
-    AudioClip _LoseClip;//ʧ��ʱ����Ƶ
+    AudioClip _LoseClip;
     public AudioClip LoseClip { get { return _LoseClip; } set { _LoseClip = value; } }
-    //[SerializeField]
-    //bool isPlay;//�Ƿ񱻵��(���ڴ���ͬʱ���ֵ����Ŀǰ��˵�ò���)
+
     public SpriteRenderer SpriteRenderer;
+    public bool IsActive = true; // 当前是否“被激活”
+
     private void OnEnable()
     {
         TimeOfExistence = 0;
@@ -37,14 +38,16 @@ public class InputMode : MonoBehaviour, IController
     void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
-        StartTime = editModel.ThisTime;
-        if (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence > editModel.EditAudioClip.length)
-        {
-            EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence) - editModel.EditAudioClip.length);
-            return;
-        }
-        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence;
+
+        float centerTime = drwmsData.DrwmsData.CenterTime;
+        float existence = drwmsData.DrwmsData.VTimeOfExistence;
+
+        StartTime = centerTime - existence / 2f;
+        EndTime = centerTime + existence / 2f;
     }
+
+
+
     void Start()
     {
         Init();
@@ -84,7 +87,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeUp)
         {
-            Debug.Log("�ϻ�");
             Succeed();
             return;
         }
@@ -95,7 +97,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeDown)
         {
-            Debug.Log("�»�");
             Succeed();
             return;
         }
@@ -106,7 +107,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeLeft)
         {
-            Debug.Log("��");
             Succeed();
             return;
         }
@@ -117,7 +117,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeRight)
         {
-            Debug.Log("�һ�");
             Succeed();
             return;
         }
@@ -128,7 +127,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.Click)
         {
-            Debug.Log("���");
             Succeed();
             return;
         }
@@ -138,14 +136,14 @@ public class InputMode : MonoBehaviour, IController
     void Succeed()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip },new float[] { drwmsData.MusicData.SSucceedVolume });
+        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip }, new float[] { drwmsData.MusicData.SSucceedVolume });
         this.SendEvent<SucceedTrigger>();
         Destroy(gameObject);
     }
     void Lose()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[]{ _LoseClip}, new float[] { drwmsData.MusicData.SLoseVolume });
+        AudioEditManager.Instance.Play(new AudioClip[] { _LoseClip }, new float[] { drwmsData.MusicData.SLoseVolume });
         this.SendEvent<LoseTrigger>();
         Destroy(gameObject);
     }
@@ -164,18 +162,16 @@ public class InputMode : MonoBehaviour, IController
         return GameBody.Interface;
     }
 }
-/// <summary>
-/// ��������
-/// </summary>
+
 public enum TheTypeOfOperation
 {
-  SwipeUp,    
-  SwipeDown,    
-  SwipeLeft,    
-  SwipeRight,
-  Click
+    SwipeUp,
+    SwipeDown,
+    SwipeLeft,
+    SwipeRight,
+    Click
 
-  
+
 
 
 }

@@ -121,7 +121,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     }
     public void SetTime(float Time)
     {
-        this.SendCommand(new SetAudioEditThisTimeCommand(0));
+        this.SendCommand(new SetAudioEditThisTimeCommand(Time));
     }
     public void AddTime(float Speed)
     {
@@ -129,7 +129,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
             new SetAudioEditThisTimeCommand(
                 this.SendQuery(
                     new QueryAudioEditAudioClipThisTime()) + 0.01f * Speed));
-        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / _PixelUnitsPerSecond)/this.SendQuery(new QueryAudioEditAudioClipLength());
+        ScrollRect.horizontalScrollbar.value = (TimeHand.anchoredPosition.x / _PixelUnitsPerSecond) / this.SendQuery(new QueryAudioEditAudioClipLength());
     }
     public void RemoveTime(float Speed)
     {
@@ -142,6 +142,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        FindObjectOfType<CreateDrumsManager>()?.ResetAllActiveCenters(); // 清空标记 局限在谱面编辑中可以重新设置InputMode //2025/06/10 - mixyao
         TimeHand.position = eventData.position;
         this.SendCommand(new SetAudioEditThisTimeCommand((TimeHand.anchoredPosition.x) / _PixelUnitsPerSecond));
     }

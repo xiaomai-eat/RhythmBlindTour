@@ -25,7 +25,7 @@ namespace Qf.Commands.AudioEdit
             if (audioEditModel != null)
             {
                 if (audioEditModel.EditAudioClip == null) return;
-                
+
                 if(value > audioEditModel.EditAudioClip.length)
                 {
                     audioEditModel.ThisTime = audioEditModel.EditAudioClip.length;
@@ -37,7 +37,7 @@ namespace Qf.Commands.AudioEdit
                 else if(value<=0)
                 {
                     value = 0;
-                    audioEditModel.ThisTime = value;
+                    audioEditModel.ThisTime = value ;
                 }
                 else
                 {

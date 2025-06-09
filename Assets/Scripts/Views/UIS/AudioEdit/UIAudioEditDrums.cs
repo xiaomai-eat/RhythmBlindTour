@@ -11,6 +11,12 @@ public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
     Image image;
     public float ThisTime;
     public int Index;
+    UIAudioEditTimeHand timeHand;
+
+    void Awake()
+{
+    timeHand = FindObjectOfType<UIAudioEditTimeHand>();
+}
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -26,6 +32,6 @@ public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
     /// </summary>
     public void ShowData()
     {
-
+        timeHand.SetTime(this.ThisTime); //点击鼓点快速移动指针到鼓点位置 2025/06/10 - mixyao
     }
 }

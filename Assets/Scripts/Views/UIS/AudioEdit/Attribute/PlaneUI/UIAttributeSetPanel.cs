@@ -38,7 +38,11 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
     [SerializeField]
     UIValueAttribute TimeOfExistence; //存在时间
     [SerializeField]
+
     UIValueAttribute PreAdventAudioClipOffsetTime;//偏移
+    [SerializeField]
+    UIValueAttribute CenterTimeAttribute;
+
     [SerializeField]
     Button RemoveButton;
     public IArchitecture GetArchitecture()
@@ -152,6 +156,8 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
         gameObjects.Add(LoseAudioClipVolum.transform.parent.gameObject);
         gameObjects.Add(TimeOfExistence.transform.parent.gameObject);
         gameObjects.Add(PreAdventAudioClipOffsetTime.transform.parent.gameObject);
+        gameObjects.Add(CenterTimeAttribute.transform.parent.gameObject);
+
     }
     float thisTime;
     DrumsLoadData ls;
@@ -159,77 +165,132 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
     {
         thisTime = (float)Math.Round(editModel.ThisTime, 2, MidpointRounding.ToEven);
         UpdateName();
-        if (editModel.TimeLineData.ContainsKey(thisTime))
-        {
-            ls = editModel.TimeLineData[thisTime][index];
-            UpdateDataShow(ls);
-            DrwmType.SetAction(v =>
-            {
-                ls.DrwmsData.DtheTypeOfOperation = (TheTypeOfOperation)v;
-                DrwmType.SetDropdownVlaue(ls.DrwmsData.DtheTypeOfOperation);
-            });
-            PreAdventAudio.SetAction(v =>
-            {
-                ls.DrwmsData.FPreAdventAudioClipPath = ((AudioClip)v).name;
-                PreAdventAudio.SetShowFileName(ls.DrwmsData.FPreAdventAudioClipPath);
-                this.SendEvent<OnUpdateAudioEditDrumsUI>();
-            });
-            SucceedAudio.SetAction(v =>
-            {
-                ls.DrwmsData.FSucceedAudioClipPath = ((AudioClip)v).name;
-                SucceedAudio.SetShowFileName(ls.DrwmsData.FSucceedAudioClipPath);
-                //this.SendEvent<OnUpdateAudioEditDrumsUI>();
-            });
-            LoseAudioClip.SetAction(v =>
-            {
-                ls.DrwmsData.FLoseAudioClipPath = ((AudioClip)v).name;
-                LoseAudioClip.SetShowFileName(ls.DrwmsData.FLoseAudioClipPath);
-            });
-            PreAdventAudioVolum.SetAction(v =>
-            {
-                ls.MusicData.SPreAdventVolume = (float)v;
-                PreAdventAudioVolum.SetValueShow(ls.MusicData.SPreAdventVolume);
-            });
-            SucceedAudioVolum.SetAction(v =>
-            {
-                ls.MusicData.SSucceedVolume = (float)v;
-                SucceedAudioVolum.SetValueShow(ls.MusicData.SSucceedVolume);
-            });
-            LoseAudioClipVolum.SetAction(v =>
-            {
-                ls.MusicData.SLoseVolume = (float)v;
-                LoseAudioClipVolum.SetValueShow(ls.MusicData.SLoseVolume);
-            });
-            TimeOfExistence.SetAction(v =>
-            {
-                ls.DrwmsData.VTimeOfExistence = float.Parse((string)v);
-                TimeOfExistence.SetValueShow(ls.DrwmsData.VTimeOfExistence.ToString());
-            });
-            PreAdventAudioClipOffsetTime.SetAction(v =>
-            {
-                ls.DrwmsData.VPreAdventAudioClipOffsetTime = float.Parse((string)v);
-                PreAdventAudioClipOffsetTime.SetValueShow(ls.DrwmsData.VPreAdventAudioClipOffsetTime.ToString());
-                this.SendEvent<OnUpdateAudioEditDrumsUI>();
-            });
-            Show(true);
-        }
-        else
+
+        if (!editModel.TimeLineData.ContainsKey(thisTime))
         {
             Show(false);
+            return;
         }
+
+        ls = editModel.TimeLineData[thisTime][index];
+        UpdateDataShow(ls);
+
+        // 鼓点中心时间修改（统一格式）
+        CenterTimeAttribute.SetAction(v =>
+        {
+            if (!float.TryParse(v.ToString(), out float newCenterTime)) return;
+
+            float oldCenterTime = ls.DrwmsData.CenterTime;
+
+            // 从旧位置移除
+            if (editModel.TimeLineData.ContainsKey(oldCenterTime))
+            {
+                var list = editModel.TimeLineData[oldCenterTime];
+                list.Remove(ls);
+                if (list.Count == 0)
+                    editModel.TimeLineData.Remove(oldCenterTime);
+            }
+
+            ls.DrwmsData.CenterTime = newCenterTime;
+
+            if (!editModel.TimeLineData.ContainsKey(newCenterTime))
+                editModel.TimeLineData[newCenterTime] = new List<DrumsLoadData>();
+            editModel.TimeLineData[newCenterTime].Add(ls);
+
+            editModel.ThisTime = newCenterTime;
+            this.SendEvent<OnUpdateThisTime>();
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        DrwmType.SetAction(v =>
+        {
+            ls.DrwmsData.DtheTypeOfOperation = (TheTypeOfOperation)v;
+            DrwmType.SetDropdownVlaue(ls.DrwmsData.DtheTypeOfOperation);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        PreAdventAudio.SetAction(v =>
+        {
+            ls.DrwmsData.FPreAdventAudioClipPath = ((AudioClip)v).name;
+            PreAdventAudio.SetShowFileName(ls.DrwmsData.FPreAdventAudioClipPath);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        SucceedAudio.SetAction(v =>
+        {
+            ls.DrwmsData.FSucceedAudioClipPath = ((AudioClip)v).name;
+            SucceedAudio.SetShowFileName(ls.DrwmsData.FSucceedAudioClipPath);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        LoseAudioClip.SetAction(v =>
+        {
+            ls.DrwmsData.FLoseAudioClipPath = ((AudioClip)v).name;
+            LoseAudioClip.SetShowFileName(ls.DrwmsData.FLoseAudioClipPath);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        PreAdventAudioVolum.SetAction(v =>
+        {
+            ls.MusicData.SPreAdventVolume = (float)v;
+            PreAdventAudioVolum.SetValueShow(ls.MusicData.SPreAdventVolume);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        SucceedAudioVolum.SetAction(v =>
+        {
+            ls.MusicData.SSucceedVolume = (float)v;
+            SucceedAudioVolum.SetValueShow(ls.MusicData.SSucceedVolume);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        LoseAudioClipVolum.SetAction(v =>
+        {
+            ls.MusicData.SLoseVolume = (float)v;
+            LoseAudioClipVolum.SetValueShow(ls.MusicData.SLoseVolume);
+            this.SendEvent<OnUpdateAudioEditDrumsUI>();
+        });
+
+        TimeOfExistence.SetAction(v =>
+        {
+            if (float.TryParse(v.ToString(), out float result))
+            {
+                ls.DrwmsData.VTimeOfExistence = result;
+                TimeOfExistence.SetValueShow(result.ToString());
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+            }
+        });
+
+        PreAdventAudioClipOffsetTime.SetAction(v =>
+        {
+            if (float.TryParse(v.ToString(), out float result))
+            {
+                ls.DrwmsData.VPreAdventAudioClipOffsetTime = result;
+                PreAdventAudioClipOffsetTime.SetValueShow(result.ToString());
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+            }
+        });
+
+        Show(true);
     }
+
+
     void UpdateDataShow(DrumsLoadData ls)
     {
         DrwmType.SetDropdownVlaue(ls.DrwmsData.DtheTypeOfOperation);
         PreAdventAudio.SetShowFileName(ls.DrwmsData.FPreAdventAudioClipPath);
         SucceedAudio.SetShowFileName(ls.DrwmsData.FSucceedAudioClipPath);
         LoseAudioClip.SetShowFileName(ls.DrwmsData.FLoseAudioClipPath);
+
         PreAdventAudioVolum.SetValueShow(ls.MusicData.SPreAdventVolume);
         SucceedAudioVolum.SetValueShow(ls.MusicData.SSucceedVolume);
         LoseAudioClipVolum.SetValueShow(ls.MusicData.SLoseVolume);
+
         TimeOfExistence.SetValueShow(ls.DrwmsData.VTimeOfExistence.ToString());
         PreAdventAudioClipOffsetTime.SetValueShow(ls.DrwmsData.VPreAdventAudioClipOffsetTime.ToString());
+        CenterTimeAttribute.SetValueShow(ls.DrwmsData.CenterTime.ToString("0.00"));
     }
+
     public void Show(bool isbool)
     {
         foreach (var i in gameObjects)

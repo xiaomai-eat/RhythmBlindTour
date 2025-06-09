@@ -8,9 +8,7 @@ using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// ????????????????????(????????????????��??????)
-/// </summary>
+
 public class CreateDrumsManager : ManagerBase
 {
     [SerializeField]
@@ -18,70 +16,117 @@ public class CreateDrumsManager : ManagerBase
     AudioEditModel editModel;
     DataCachingModel cachingModel;
     List<InputMode> gameObjects = new();
+    // 已实例化鼓点的中心时间（防止重复创建）
+    private HashSet<float> activeDrumCenters = new();
+
     public override void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
         cachingModel = this.GetModel<DataCachingModel>();
         CreateSetClass.Instance = new CreateSetClass(audioSource);
+
         this.RegisterEvent<OnUpdateThisTime>(v =>
+{
+    if (editModel.TipsAudio.ContainsKey(v.ThisTime))
+    {
+        if (editModel.Mode.Equals(SystemModeData.PlayMode))
+            AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray(), editModel.TipsVolume[v.ThisTime].ToArray());
+    }
+
+    if (editModel.TimeLineData != null)
+    {
+        foreach (var kvp in editModel.TimeLineData)
         {
-            if (editModel.TipsAudio.ContainsKey(v.ThisTime))
+            float centerTime = kvp.Key;
+
+            foreach (var data in kvp.Value)
             {
-                if (editModel.Mode.Equals(SystemModeData.PlayMode))
-                    AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray(), editModel.TipsVolume[v.ThisTime].ToArray());
-            }
-            if (editModel.TimeLineData.ContainsKey(v.ThisTime))
-            {
-                foreach (var i in editModel.TimeLineData[v.ThisTime])
+                float existence = data.DrwmsData.VTimeOfExistence;
+                float start = centerTime - existence / 2f;
+                float end = centerTime + existence / 2f;
+
+                if (v.ThisTime >= start && v.ThisTime <= end)
                 {
-                    gameObjects.Add(CreateDrums(i.DrwmsData.DtheTypeOfOperation, i).GetInputMode());
-                }
-            }
-            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))//Bug:???????????????????(????????????????��??)
-            {
-                List<InputMode> ls = new();
-                foreach (var j in gameObjects)
-                {
-                    if (j != null)
+                    if (!activeDrumCenters.Contains(centerTime))
                     {
-                        if (v.ThisTime > j.EndTime || v.ThisTime < j.StartTime)
-                        {
-                            ls.Add(j);
-                            Destroy(j.gameObject);
-                        }
+                        var inputMode = CreateDrums(data.DrwmsData.DtheTypeOfOperation, data).GetInputMode();
+                        gameObjects.Add(inputMode);
+                        activeDrumCenters.Add(centerTime);
                     }
                 }
-                foreach (var e in ls)
-                {
-                    gameObjects.Remove(e);
-                }
             }
-
-
-        }).UnRegisterWhenGameObjectDestroyed(gameObject);
-        Debug.Log("CreateDrumsManager ?????...");
+        }
     }
+
+    if (!editModel.Mode.Equals(SystemModeData.PlayMode))
+    {
+        List<InputMode> toRemove = new();
+
+        foreach (var j in gameObjects)
+        {
+            if (j != null && (v.ThisTime > j.EndTime || v.ThisTime < j.StartTime))
+            {
+                toRemove.Add(j);
+                Destroy(j.gameObject);
+
+                // ❗ 移除对应鼓点标识，允许将来重新生成
+                activeDrumCenters.Remove(j.DrwmsData.DrwmsData.CenterTime);
+            }
+        }
+
+        foreach (var e in toRemove)
+        {
+            gameObjects.Remove(e);
+        }
+    }
+
+}).UnRegisterWhenGameObjectDestroyed(gameObject);
+
+
+        Debug.Log("CreateDrumsManager initialized...");
+    }
+
     /// <summary>
-    /// ?????????
+    /// 清除所有活跃鼓点中心时间（允许再次实例化所有鼓点）
+    /// 用于编辑模式下调试和手动重置
     /// </summary>
-    /// <param name="operation"></param>
-    /// <param name="vector3"></param>
+    public void ResetAllActiveCenters()
+    {
+        activeDrumCenters.Clear();
+        Debug.Log("[CreateDrumsManager] 所有 activeDrumCenters 已清空。");
+    }
+
+
     public CreateSetClass CreateDrums(TheTypeOfOperation operation, DrumsLoadData drumsLoadData = null)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
         InputMode mode = gameObject.GetComponent<InputMode>();
+
+        // 如果未设置中心时间，使用当前 ThisTime 作为默认
+        if (drumsLoadData != null && drumsLoadData.DrwmsData.CenterTime == 0f)
+        {
+            drumsLoadData.DrwmsData.CenterTime = this.GetModel<AudioEditModel>().ThisTime;
+        }
+
         mode.DrwmsData = drumsLoadData;
+
+        // 音效赋值
         mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FPreAdventAudioClipPath);
         mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FLoseAudioClipPath);
         mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FSucceedAudioClipPath);
+
         CreateSetClass.Instance.SetInputMode(mode);
         mode.SetOperation(operation);
+
         this.SendEvent(new DrumsGenerate()
         {
             InputMode = mode
         });
+
         return CreateSetClass.Instance;
     }
+
+
 
     public class CreateSetClass
     {
@@ -107,10 +152,7 @@ public class CreateDrumsManager : ManagerBase
                     instance = value;
             }
         }
-        /// <summary>
-        /// ?????????InputMode
-        /// </summary>
-        /// <param name="inputMode"></param>
+
         public void SetInputMode(InputMode inputMode)
         {
             _Mode = inputMode;
@@ -124,18 +166,14 @@ public class CreateDrumsManager : ManagerBase
             _Mode.DrwmsData = drumsLoadData;
             return _Mode;
         }
-        /// <summary>
-        /// ????????????��(??��????????)
-        /// </summary>
+
         public void SetSuccessSounds(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
                 _Mode.SuccessClip = Clip;
             SetCpVector(channelPosition);
         }
-        /// <summary>
-        /// ???????????��(??��????????)
-        /// </summary>
+
         public void SetPreAdventSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
@@ -143,9 +181,7 @@ public class CreateDrumsManager : ManagerBase
             _Mode.DrwmsData.DrwmsData.VPreAdventAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
-        /// <summary>
-        /// ?????????��(??��????????)
-        /// </summary>
+
         public void SetFailureSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
@@ -171,7 +207,7 @@ public class CreateDrumsManager : ManagerBase
         }
     }
 
-    public enum ChannelPosition //????��??
+    public enum ChannelPosition
     {
         LeftChannel,
         RightChannel,
