@@ -34,29 +34,31 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
     }
     public void AddDrwms(int i = 0)
     {
-        if (i == 4)
-            AddDrwms(TheTypeOfOperation.Click);
-        else if (i == 1)
+        TheTypeOfOperation operation;
+        switch (i)
         {
-            AddDrwms(TheTypeOfOperation.SwipeDown);
+            case 0:
+                operation = TheTypeOfOperation.SwipeUp;
+                break;
+            case 1:
+                operation = TheTypeOfOperation.SwipeDown;
+                break;
+            case 2:
+                operation = TheTypeOfOperation.SwipeLeft;
+                break;
+            case 3:
+                operation = TheTypeOfOperation.SwipeRight;
+                break;
+            case 4:
+                operation = TheTypeOfOperation.Click;
+                break;
+            default:
+                Debug.LogWarning($"δ��������Ʊ��: {i}");
+                return;
         }
-        else if (i == 0)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeUp);
-        }
-        else if (i == 2)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeLeft);
-        }
-        else if (i == 3)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeRight);
-        }
-        else
-        {
-
-        }
+        AddDrwms(operation);
     }
+
     public void AddDrwms(TheTypeOfOperation theTypeOfOperation)
     {
         if (editModel.EditAudioClip == null) return;
@@ -128,27 +130,62 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
         RectTransform gorecttransform;
         foreach (var item in a.Keys)
         {
-            go = null;
             for (int i = 0; i < a[item].Count; i++)
             {
                 if (a[item][i] == null) continue;
-                go = Instantiate(DrumsProfabs).transform;
-                go.SetParent(DrumsUI[i].transform);
-                gorecttransform = go.GetComponent<RectTransform>();
-                go.transform.position = new Vector3(transform.position.x, DrumsUI[i].transform.position.y - (_EditHeight / DrumsUI.Length / 2), transform.position.z);
-                gorecttransform.anchoredPosition = new Vector2(item * _PixelUnitsPerSecond, gorecttransform.anchoredPosition.y);
-                gorecttransform.sizeDelta = new Vector2(a[item][i].DrwmsData.VTimeOfExistence * gorecttransform.sizeDelta.x, gorecttransform.sizeDelta.y);
-                uiDrums = go.GetComponent<UIAudioEditDrums>();
-                uiDrums.SetColor(new Color(Random.Range(0, 101) / (float)100, Random.Range(0, 101) / (float)100, Random.Range(0, 101) / (float)100, 1));
-                uiDrums.ThisTime = item;
-                uiDrums.Index = i;
-                DrumsUIInDrums.Add(go.gameObject);
+                CreateDrumItemUI(item, i, a);
             }
         }
+
     }
+
+    void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> a)
+    {
+        var drumData = a[item][i];
+        float tipOffset = drumData.DrwmsData.VPreAdventAudioClipOffsetTime;
+        float existence = drumData.DrwmsData.VTimeOfExistence;
+        float preStart = item - tipOffset;
+        float start = item + tipOffset;
+
+        var drumRoot = new GameObject("DrumRoot");
+        drumRoot.transform.SetParent(DrumsUI[i].transform);
+        RectTransform rootRect = drumRoot.AddComponent<RectTransform>();
+        rootRect.anchorMin = new Vector2(0, 0.5f);
+        rootRect.anchorMax = new Vector2(0, 0.5f);
+        rootRect.pivot = new Vector2(0, 0.5f);
+        rootRect.anchoredPosition = Vector2.zero;
+        rootRect.localScale = Vector3.one;
+
+        var preTipGO = new GameObject("PreTipArea");
+        preTipGO.transform.SetParent(drumRoot.transform);
+        RectTransform preRect = preTipGO.AddComponent<RectTransform>();
+        preRect.anchorMin = new Vector2(0, 0.5f);
+        preRect.anchorMax = new Vector2(0, 0.5f);
+        preRect.pivot = new Vector2(0, 0.5f);
+        preRect.anchoredPosition = new Vector2(preStart * _PixelUnitsPerSecond, 0);
+        preRect.sizeDelta = new Vector2(tipOffset * _PixelUnitsPerSecond, _EditHeight / DrumsUI.Length);
+
+        var preImage = preTipGO.AddComponent<UnityEngine.UI.Image>();
+        preImage.color = new Color(192f / 255f, 192f / 255f, 192f / 255f, 0.5f); // RGB(192,192,192)
+
+        var drumGO = Instantiate(DrumsProfabs, drumRoot.transform);
+        RectTransform drumRect = drumGO.GetComponent<RectTransform>();
+
+        drumRect.anchoredPosition = new Vector2(start * _PixelUnitsPerSecond, 0);
+
+        drumRect.sizeDelta = new Vector2(existence * _PixelUnitsPerSecond, drumRect.sizeDelta.y);
+
+        var uiDrums = drumGO.GetComponent<UIAudioEditDrums>();
+        uiDrums.SetColor(new Color(211f / 255f, 84f / 255f, 0f, 1f)); uiDrums.ThisTime = item;
+        uiDrums.Index = i;
+
+        DrumsUIInDrums.Add(drumRoot.gameObject);
+    }
+
+
     void StartLength()
     {
-        //��ʼ���������?
+        //��ʼ���������?
         float SongTime = this.SendQuery(new QueryAudioEditAudioClipLength());
         for (int i = 0; i < DrumsUI.Length; i++)
         {

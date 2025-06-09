@@ -167,6 +167,8 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 ls.DrwmsData.DtheTypeOfOperation = (TheTypeOfOperation)v;
                 DrwmType.SetDropdownVlaue(ls.DrwmsData.DtheTypeOfOperation);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+
             });
             PreAdventAudio.SetAction(v =>
             {
@@ -178,32 +180,41 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
             {
                 ls.DrwmsData.FSucceedAudioClipPath = ((AudioClip)v).name;
                 SucceedAudio.SetShowFileName(ls.DrwmsData.FSucceedAudioClipPath);
-                //this.SendEvent<OnUpdateAudioEditDrumsUI>();
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
             });
             LoseAudioClip.SetAction(v =>
             {
                 ls.DrwmsData.FLoseAudioClipPath = ((AudioClip)v).name;
                 LoseAudioClip.SetShowFileName(ls.DrwmsData.FLoseAudioClipPath);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+
             });
             PreAdventAudioVolum.SetAction(v =>
             {
                 ls.MusicData.SPreAdventVolume = (float)v;
                 PreAdventAudioVolum.SetValueShow(ls.MusicData.SPreAdventVolume);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+
             });
             SucceedAudioVolum.SetAction(v =>
             {
                 ls.MusicData.SSucceedVolume = (float)v;
                 SucceedAudioVolum.SetValueShow(ls.MusicData.SSucceedVolume);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+
             });
             LoseAudioClipVolum.SetAction(v =>
             {
                 ls.MusicData.SLoseVolume = (float)v;
                 LoseAudioClipVolum.SetValueShow(ls.MusicData.SLoseVolume);
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
+
             });
             TimeOfExistence.SetAction(v =>
             {
                 ls.DrwmsData.VTimeOfExistence = float.Parse((string)v);
                 TimeOfExistence.SetValueShow(ls.DrwmsData.VTimeOfExistence.ToString());
+                this.SendEvent<OnUpdateAudioEditDrumsUI>();
             });
             PreAdventAudioClipOffsetTime.SetAction(v =>
             {

@@ -37,13 +37,13 @@ public class InputMode : MonoBehaviour, IController
     void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
-        StartTime = editModel.ThisTime;
+        StartTime = editModel.ThisTime + drwmsData.DrwmsData.VPreAdventAudioClipOffsetTime;
         if (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence > editModel.EditAudioClip.length)
         {
             EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence) - editModel.EditAudioClip.length);
             return;
         }
-        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence;
+        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence ;
     }
     void Start()
     {
