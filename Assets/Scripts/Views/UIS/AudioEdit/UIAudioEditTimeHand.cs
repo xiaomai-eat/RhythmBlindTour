@@ -121,7 +121,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     }
     public void SetTime(float Time)
     {
-        this.SendCommand(new SetAudioEditThisTimeCommand(0));
+        this.SendCommand(new SetAudioEditThisTimeCommand(Time));
     }
     public void AddTime(float Speed)
     {

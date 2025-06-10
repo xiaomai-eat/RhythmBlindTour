@@ -12,23 +12,22 @@ public class InputMode : MonoBehaviour, IController
     [SerializeField]
     TheTypeOfOperation Operation;
     AudioEditModel editModel;
-    DrumsLoadData drwmsData = new();//�ĵ�����
+    DrumsLoadData drwmsData = new();
     public DrumsLoadData DrwmsData { get { return drwmsData; } set { drwmsData = value; } }
     public float StartTime;
     public float EndTime;
     [SerializeField]
-    float TimeOfExistence;//�ĵ����ʱ��
+    float TimeOfExistence;
     [SerializeField]
-    AudioClip _PreAdventClip;//����ǰ���ŵ���Ƶ
+    AudioClip _PreAdventClip;
     public AudioClip PreAdventClip { get { return _PreAdventClip; } set { _PreAdventClip = value; } }
     [SerializeField]
-    AudioClip _SucceedClip;//�ɹ�ʱ����Ƶ
+    AudioClip _SucceedClip;
     public AudioClip SuccessClip { get { return _SucceedClip; } set { _SucceedClip = value; } }
     [SerializeField]
-    AudioClip _LoseClip;//ʧ��ʱ����Ƶ
+    AudioClip _LoseClip;
     public AudioClip LoseClip { get { return _LoseClip; } set { _LoseClip = value; } }
-    //[SerializeField]
-    //bool isPlay;//�Ƿ񱻵��(���ڴ���ͬʱ���ֵ����Ŀǰ��˵�ò���)
+   
     public SpriteRenderer SpriteRenderer;
     private void OnEnable()
     {
@@ -40,10 +39,18 @@ public class InputMode : MonoBehaviour, IController
         StartTime = editModel.ThisTime + drwmsData.DrwmsData.VPreAdventAudioClipOffsetTime;
         if (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence > editModel.EditAudioClip.length)
         {
-            EndTime = editModel.ThisTime + ((editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence) - editModel.EditAudioClip.length);
+            EndTime = editModel.ThisTime + (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence - editModel.EditAudioClip.length);
             return;
         }
-        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence ;
+        else
+        {
+        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence;
+
+        }
+        
+            float shift = (EndTime - StartTime) / 2f;
+    StartTime -= shift;
+    EndTime -= shift;
     }
     void Start()
     {
@@ -84,7 +91,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeUp)
         {
-            Debug.Log("�ϻ�");
             Succeed();
             return;
         }
@@ -95,7 +101,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeDown)
         {
-            Debug.Log("�»�");
             Succeed();
             return;
         }
@@ -106,7 +111,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeLeft)
         {
-            Debug.Log("��");
             Succeed();
             return;
         }
@@ -117,7 +121,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.SwipeRight)
         {
-            Debug.Log("�һ�");
             Succeed();
             return;
         }
@@ -128,7 +131,6 @@ public class InputMode : MonoBehaviour, IController
     {
         if (InputSystems.Click)
         {
-            Debug.Log("���");
             Succeed();
             return;
         }
@@ -164,9 +166,7 @@ public class InputMode : MonoBehaviour, IController
         return GameBody.Interface;
     }
 }
-/// <summary>
-/// ��������
-/// </summary>
+
 public enum TheTypeOfOperation
 {
   SwipeUp,    

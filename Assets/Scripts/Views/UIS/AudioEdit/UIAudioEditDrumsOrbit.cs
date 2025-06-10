@@ -8,6 +8,7 @@ using Qf.Systems;
 using QFramework;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
 {
@@ -85,8 +86,8 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
                 SSucceedVolume = editModel.SucceedAudioVolume.Value
             }
         };
-
-        this.SendCommand(new AddAudioEditTimeLineDataCommand(editModel.ThisTime, newDrums));
+        
+        this.SendCommand(new AddAudioEditTimeLineDataCommand(editModel.ThisTime + editModel.TipOffset.Value, newDrums)); // 指针位置设置提示音位置 偏移鼓点到提示音后 2025/06/10 - mixyao 
     }
 
 
@@ -139,48 +140,87 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
 
     }
 
-    void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> a)
-    {
-        var drumData = a[item][i];
-        float tipOffset = drumData.DrwmsData.VPreAdventAudioClipOffsetTime;
-        float existence = drumData.DrwmsData.VTimeOfExistence;
-        float preStart = item - tipOffset;
-        float start = item + tipOffset;
+void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> a)
+{
+    var drumData = a[item][i];
+    float tipOffset = drumData.DrwmsData.VPreAdventAudioClipOffsetTime;
+    float existence = drumData.DrwmsData.VTimeOfExistence;
+    float preStart = item - tipOffset;
+    float start = item;
 
-        var drumRoot = new GameObject("DrumRoot");
-        drumRoot.transform.SetParent(DrumsUI[i].transform);
-        RectTransform rootRect = drumRoot.AddComponent<RectTransform>();
-        rootRect.anchorMin = new Vector2(0, 0.5f);
-        rootRect.anchorMax = new Vector2(0, 0.5f);
-        rootRect.pivot = new Vector2(0, 0.5f);
-        rootRect.anchoredPosition = Vector2.zero;
-        rootRect.localScale = Vector3.one;
+    float pixelExistence = existence * _PixelUnitsPerSecond;
+    float drumX = start * _PixelUnitsPerSecond;
 
-        var preTipGO = new GameObject("PreTipArea");
-        preTipGO.transform.SetParent(drumRoot.transform);
-        RectTransform preRect = preTipGO.AddComponent<RectTransform>();
-        preRect.anchorMin = new Vector2(0, 0.5f);
-        preRect.anchorMax = new Vector2(0, 0.5f);
-        preRect.pivot = new Vector2(0, 0.5f);
-        preRect.anchoredPosition = new Vector2(preStart * _PixelUnitsPerSecond, 0);
-        preRect.sizeDelta = new Vector2(tipOffset * _PixelUnitsPerSecond, _EditHeight / DrumsUI.Length);
+    // 创建 drumRoot
+    var drumRoot = new GameObject("DrumRoot");
+    drumRoot.transform.SetParent(DrumsUI[i].transform);
+    RectTransform rootRect = drumRoot.AddComponent<RectTransform>();
+    rootRect.anchorMin = new Vector2(0, 0.5f);
+    rootRect.anchorMax = new Vector2(0, 0.5f);
+    rootRect.pivot = new Vector2(0, 0.5f);
+    rootRect.anchoredPosition = Vector2.zero;
+    rootRect.localScale = Vector3.one;
 
-        var preImage = preTipGO.AddComponent<UnityEngine.UI.Image>();
-        preImage.color = new Color(192f / 255f, 192f / 255f, 192f / 255f, 0.5f); // RGB(192,192,192)
+    // 创建 drum 本体
+    var drumGO = Instantiate(DrumsProfabs, drumRoot.transform);
+    drumGO.name = "Drum";
+    RectTransform drumRect = drumGO.GetComponent<RectTransform>();
+    drumRect.anchorMin = new Vector2(0, 0.5f);
+    drumRect.anchorMax = new Vector2(0, 0.5f);
+    drumRect.pivot = new Vector2(0, 0.5f);
+    drumRect.localScale = Vector3.one;
 
-        var drumGO = Instantiate(DrumsProfabs, drumRoot.transform);
-        RectTransform drumRect = drumGO.GetComponent<RectTransform>();
+    // drum 左移一半长度
+    drumRect.anchoredPosition = new Vector2(drumX - pixelExistence / 2f, 0);
+    drumRect.sizeDelta = new Vector2(pixelExistence, drumRect.sizeDelta.y);
 
-        drumRect.anchoredPosition = new Vector2(start * _PixelUnitsPerSecond, 0);
+    var uiDrums = drumGO.GetComponent<UIAudioEditDrums>();
+    uiDrums.ThisTime = item;
+    uiDrums.Index = i;
 
-        drumRect.sizeDelta = new Vector2(existence * _PixelUnitsPerSecond, drumRect.sizeDelta.y);
+    // 创建 preTip 区域
+    var preTipGO = Instantiate(DrumsProfabs, drumRoot.transform);
+    preTipGO.name = "PreTipArea";
+    RectTransform preRect = preTipGO.GetComponent<RectTransform>();
+    preRect.anchorMin = new Vector2(0, 0.5f);
+    preRect.anchorMax = new Vector2(0, 0.5f);
+    preRect.pivot = new Vector2(1, 0.5f); // 右对齐 drum 左侧
+    preRect.localScale = Vector3.one;
+    preRect.anchoredPosition = new Vector2(drumX, 0); // 不变
+    preRect.sizeDelta = new Vector2(tipOffset * _PixelUnitsPerSecond, drumRect.sizeDelta.y);
 
-        var uiDrums = drumGO.GetComponent<UIAudioEditDrums>();
-        uiDrums.SetColor(new Color(211f / 255f, 84f / 255f, 0f, 1f)); uiDrums.ThisTime = item;
-        uiDrums.Index = i;
+    var preUI = preTipGO.GetComponent<UIAudioEditDrums>();
+    preUI.SetColor(new Color(40f / 255f, 40f / 255f, 40f / 255f, 0.8f));
+    preUI.ThisTime = item - tipOffset;
+    preUI.Index = i;
+    uiDrums.SetColor(new Color(211f / 255f, 84f / 255f, 0f, 1f));
 
-        DrumsUIInDrums.Add(drumRoot.gameObject);
-    }
+    // 添加红色起始柱
+    GameObject startBar = new GameObject("StartBar", typeof(Image));
+    startBar.transform.SetParent(preTipGO.transform, false);
+    RectTransform startRect = startBar.GetComponent<RectTransform>();
+    startRect.anchorMin = new Vector2(0, 0.5f);
+    startRect.anchorMax = new Vector2(0, 0.5f);
+    startRect.pivot = new Vector2(0, 0.5f);
+    startRect.anchoredPosition = Vector2.zero;
+    startRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y); // 3f 为红柱宽度
+    startBar.GetComponent<Image>().color = Color.red;
+
+    // 添加红色结束柱
+    GameObject endBar = new GameObject("EndBar", typeof(Image));
+    endBar.transform.SetParent(preTipGO.transform, false);
+    RectTransform endRect = endBar.GetComponent<RectTransform>();
+    endRect.anchorMin = new Vector2(1, 0.5f);
+    endRect.anchorMax = new Vector2(1, 0.5f);
+    endRect.pivot = new Vector2(1, 0.5f);
+    endRect.anchoredPosition = Vector2.zero;
+    endRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y);
+    endBar.GetComponent<Image>().color = Color.red;
+
+    // 添加 root 到管理列表
+    DrumsUIInDrums.Add(drumRoot.gameObject);
+}
+
 
 
     void StartLength()

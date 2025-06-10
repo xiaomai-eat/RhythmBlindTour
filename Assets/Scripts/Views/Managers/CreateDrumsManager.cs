@@ -8,9 +8,7 @@ using QFramework;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-/// <summary>
-/// ????????????????????(????????????????��??????)
-/// </summary>
+
 public class CreateDrumsManager : ManagerBase
 {
     [SerializeField]
@@ -34,10 +32,11 @@ public class CreateDrumsManager : ManagerBase
             {
                 foreach (var i in editModel.TimeLineData[v.ThisTime])
                 {
+                    
                     gameObjects.Add(CreateDrums(i.DrwmsData.DtheTypeOfOperation, i).GetInputMode());
                 }
             }
-            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))//Bug:???????????????????(????????????????��??)
+            else if (!editModel.Mode.Equals(SystemModeData.PlayMode))
             {
                 List<InputMode> ls = new();
                 foreach (var j in gameObjects)
@@ -61,11 +60,7 @@ public class CreateDrumsManager : ManagerBase
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         Debug.Log("CreateDrumsManager ?????...");
     }
-    /// <summary>
-    /// ?????????
-    /// </summary>
-    /// <param name="operation"></param>
-    /// <param name="vector3"></param>
+
     public CreateSetClass CreateDrums(TheTypeOfOperation operation, DrumsLoadData drumsLoadData = null)
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
@@ -107,10 +102,7 @@ public class CreateDrumsManager : ManagerBase
                     instance = value;
             }
         }
-        /// <summary>
-        /// ?????????InputMode
-        /// </summary>
-        /// <param name="inputMode"></param>
+ 
         public void SetInputMode(InputMode inputMode)
         {
             _Mode = inputMode;
@@ -124,18 +116,14 @@ public class CreateDrumsManager : ManagerBase
             _Mode.DrwmsData = drumsLoadData;
             return _Mode;
         }
-        /// <summary>
-        /// ????????????��(??��????????)
-        /// </summary>
+
         public void SetSuccessSounds(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
                 _Mode.SuccessClip = Clip;
             SetCpVector(channelPosition);
         }
-        /// <summary>
-        /// ???????????��(??��????????)
-        /// </summary>
+
         public void SetPreAdventSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
@@ -143,9 +131,7 @@ public class CreateDrumsManager : ManagerBase
             _Mode.DrwmsData.DrwmsData.VPreAdventAudioClipOffsetTime = DelayTime;
             SetCpVector(channelPosition);
         }
-        /// <summary>
-        /// ?????????��(??��????????)
-        /// </summary>
+   
         public void SetFailureSound(AudioClip Clip, float DelayTime, ChannelPosition channelPosition = ChannelPosition.FullChannel)
         {
             if (Clip != null)
@@ -171,7 +157,7 @@ public class CreateDrumsManager : ManagerBase
         }
     }
 
-    public enum ChannelPosition //????��??
+    public enum ChannelPosition
     {
         LeftChannel,
         RightChannel,
