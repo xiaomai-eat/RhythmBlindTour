@@ -12,51 +12,69 @@ using UnityEngine.UI;
 
 public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
 {
+    [System.Serializable]
+    public class TrackStyle
+    {
+        public TheTypeOfOperation Operation;
+        public Color DrumColor;
+        public Color PreTipColor;
+        public Sprite DrumSprite;
+        public Sprite PreTipSprite;
+    }
+
     [SerializeField]
-    GameObject DrumsProfabs;//�ĵ�Ԥ����
+    private List<TrackStyle> trackStyles = new(); // �����ʽ
+    [SerializeField]
+    GameObject DrumsProfabs;
     [SerializeField]
     RectTransform[] DrumsUI;
     [SerializeField]
     List<GameObject> DrumsUIInDrums = new();
-    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//ÿ�����ص�λ
-    int _EditHeight = AudioEditConfig.EditHeight;//�༭���ɱ༭��Χ�߶�
+
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;
+    int _EditHeight = AudioEditConfig.EditHeight;
     AudioEditModel editModel;
+    Dictionary<TheTypeOfOperation, int> operationToTrackIndex;
+
     void Start()
     {
         Init();
     }
-    void Update()
+
+    void Update() => InputContller();
+
+    IArchitecture IBelongToArchitecture.GetArchitecture() => GameBody.Interface;
+
+    void Init()
     {
-        InputContller();
+        editModel = this.GetModel<AudioEditModel>();
+        InitOperationTracks();
+        StartLength();
+        this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v => UpDateDrwmsUI()).UnRegisterWhenGameObjectDestroyed(gameObject);
+        this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
     }
-    IArchitecture IBelongToArchitecture.GetArchitecture()
+
+    void InitOperationTracks()
     {
-        return GameBody.Interface;
+        operationToTrackIndex = new();
+        for (int i = 0; i < trackStyles.Count; i++)
+        {
+            if (!operationToTrackIndex.ContainsKey(trackStyles[i].Operation))
+                operationToTrackIndex[trackStyles[i].Operation] = i;
+        }
     }
+
     public void AddDrwms(int i = 0)
     {
-        TheTypeOfOperation operation;
-        switch (i)
+        TheTypeOfOperation operation = i switch
         {
-            case 0:
-                operation = TheTypeOfOperation.SwipeUp;
-                break;
-            case 1:
-                operation = TheTypeOfOperation.SwipeDown;
-                break;
-            case 2:
-                operation = TheTypeOfOperation.SwipeLeft;
-                break;
-            case 3:
-                operation = TheTypeOfOperation.SwipeRight;
-                break;
-            case 4:
-                operation = TheTypeOfOperation.Click;
-                break;
-            default:
-                Debug.LogWarning($"δ��������Ʊ��: {i}");
-                return;
-        }
+            0 => TheTypeOfOperation.SwipeUp,
+            1 => TheTypeOfOperation.SwipeDown,
+            2 => TheTypeOfOperation.SwipeLeft,
+            3 => TheTypeOfOperation.SwipeRight,
+            4 => TheTypeOfOperation.Click,
+            _ => TheTypeOfOperation.Click
+        };
         AddDrwms(operation);
     }
 
@@ -67,6 +85,9 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
         var tipClip = this.SendQuery(new QueryAudioEditComeTipAudio(theTypeOfOperation));
         var succeedClip = this.SendQuery(new QueryAudioEditSucceedsAudio(theTypeOfOperation));
         var loseClip = editModel.LoseAudioClip;
+        float tipOffset = editModel.TipOffset.Value;
+        float existence = editModel.TimeOfExistence.Value;
+        float centerTime = editModel.ThisTime + tipOffset;
 
         var newDrums = new DrumsLoadData()
         {
@@ -76,8 +97,9 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
                 FPreAdventAudioClipPath = tipClip?.name,
                 FSucceedAudioClipPath = succeedClip?.name,
                 FLoseAudioClipPath = loseClip?.name,
-                VPreAdventAudioClipOffsetTime = editModel.TipOffset.Value,
-                VTimeOfExistence = editModel.TimeOfExistence.Value
+                VPreAdventAudioClipOffsetTime = tipOffset,
+                VTimeOfExistence = existence,
+                CenterTime = centerTime,
             },
             MusicData = new MusicData()
             {
@@ -86,146 +108,112 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
                 SSucceedVolume = editModel.SucceedAudioVolume.Value
             }
         };
-        
-        this.SendCommand(new AddAudioEditTimeLineDataCommand(editModel.ThisTime + editModel.TipOffset.Value, newDrums)); // 指针位置设置提示音位置 偏移鼓点到提示音后 2025/06/10 - mixyao 
+
+        this.SendCommand(new AddAudioEditTimeLineDataCommand(centerTime, newDrums));
     }
 
+    void UpDateDrwmsUI() => UpDateAllDrwmsUI();
 
-    public void RemoveDrwms(int index = -1)
-    {
-        Debug.Log($"ɾ���ĵ�{editModel.ThisTime}");
-        this.SendCommand(new RemoveAudioEditTimeLineDataCommand(
-            editModel.ThisTime,
-            index
-            ));
-    }
-    public void PlayAllDrwmsUI()
-    {
-
-    }
-    void Init()
-    {
-        editModel = this.GetModel<AudioEditModel>();
-        StartLength();
-        this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v => UpDateDrwmsUI()).UnRegisterWhenGameObjectDestroyed(gameObject);
-        this.RegisterEvent<MainAudioChangeValue>(v => StartLength()).UnRegisterWhenGameObjectDestroyed(gameObject);
-
-    }
-    void UpDateDrwmsUI()//������Ҫ�Ż�<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<(Ŀǰ����ʱʵ�ֹ���)
-    {
-        //��ʼ���ĵ�����
-        UpDateAllDrwmsUI();
-    }
     void UpDateAllDrwmsUI()
     {
-        //����ĵ�UI
         foreach (var item in DrumsUIInDrums)
-        {
             Destroy(item);
-        }
         DrumsUIInDrums.Clear();
-        //ͨ���ֵ�����ʵ�������йĵ�λ��
-        var a = this.SendQuery(new QueryAudioEditTimeLineAllData());
-        Transform go;
-        UIAudioEditDrums uiDrums;
-        RectTransform gorecttransform;
-        foreach (var item in a.Keys)
+
+        var dataDict = this.SendQuery(new QueryAudioEditTimeLineAllData());
+
+        foreach (var item in dataDict.Keys)
         {
-            for (int i = 0; i < a[item].Count; i++)
+            for (int i = 0; i < dataDict[item].Count; i++)
             {
-                if (a[item][i] == null) continue;
-                CreateDrumItemUI(item, i, a);
+                if (dataDict[item][i] == null) continue;
+                CreateDrumItemUI(item, i, dataDict);
             }
         }
-
     }
 
-void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> a)
-{
-    var drumData = a[item][i];
-    float tipOffset = drumData.DrwmsData.VPreAdventAudioClipOffsetTime;
-    float existence = drumData.DrwmsData.VTimeOfExistence;
-    float preStart = item - tipOffset;
-    float start = item;
+    void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> dataDict)
+    {
+        var drumData = dataDict[item][i];
+        var op = drumData.DrwmsData.DtheTypeOfOperation;
 
-    float pixelExistence = existence * _PixelUnitsPerSecond;
-    float drumX = start * _PixelUnitsPerSecond;
+        if (!operationToTrackIndex.TryGetValue(op, out int trackIndex))
+        {
+            Debug.LogWarning($"���� {op} δ�󶨹��");
+            return;
+        }
 
-    // 创建 drumRoot
-    var drumRoot = new GameObject("DrumRoot");
-    drumRoot.transform.SetParent(DrumsUI[i].transform);
-    RectTransform rootRect = drumRoot.AddComponent<RectTransform>();
-    rootRect.anchorMin = new Vector2(0, 0.5f);
-    rootRect.anchorMax = new Vector2(0, 0.5f);
-    rootRect.pivot = new Vector2(0, 0.5f);
-    rootRect.anchoredPosition = Vector2.zero;
-    rootRect.localScale = Vector3.one;
+        var style = trackStyles[trackIndex];
+        float tipOffset = drumData.DrwmsData.VPreAdventAudioClipOffsetTime;
+        float existence = drumData.DrwmsData.VTimeOfExistence;
+        float drumX = item * _PixelUnitsPerSecond;
+        float pixelExistence = existence * _PixelUnitsPerSecond;
 
-    // 创建 drum 本体
-    var drumGO = Instantiate(DrumsProfabs, drumRoot.transform);
-    drumGO.name = "Drum";
-    RectTransform drumRect = drumGO.GetComponent<RectTransform>();
-    drumRect.anchorMin = new Vector2(0, 0.5f);
-    drumRect.anchorMax = new Vector2(0, 0.5f);
-    drumRect.pivot = new Vector2(0, 0.5f);
-    drumRect.localScale = Vector3.one;
+        var drumRoot = new GameObject("DrumRoot");
+        drumRoot.transform.SetParent(DrumsUI[trackIndex].transform);
+        var rootRect = drumRoot.AddComponent<RectTransform>();
+        rootRect.anchorMin = rootRect.anchorMax = new Vector2(0, 0.5f);
+        rootRect.pivot = new Vector2(0, 0.5f);
+        rootRect.anchoredPosition = Vector2.zero;
+        rootRect.localScale = Vector3.one;
 
-    // drum 左移一半长度
-    drumRect.anchoredPosition = new Vector2(drumX - pixelExistence / 2f, 0);
-    drumRect.sizeDelta = new Vector2(pixelExistence, drumRect.sizeDelta.y);
+        var drumGO = Instantiate(DrumsProfabs, drumRoot.transform);
+        drumGO.name = "Drum";
+        var drumRect = drumGO.GetComponent<RectTransform>();
+        drumRect.anchorMin = drumRect.anchorMax = new Vector2(0, 0.5f);
+        drumRect.pivot = new Vector2(0, 0.5f);
+        drumRect.localScale = Vector3.one;
+        drumRect.anchoredPosition = new Vector2(drumX - pixelExistence / 2f, 0);
+        drumRect.sizeDelta = new Vector2(pixelExistence, drumRect.sizeDelta.y);
 
-    var uiDrums = drumGO.GetComponent<UIAudioEditDrums>();
-    uiDrums.ThisTime = item;
-    uiDrums.Index = i;
+        var drumImage = drumGO.GetComponent<Image>();
+        if (drumImage && style.DrumSprite) drumImage.sprite = style.DrumSprite;
+        drumImage.color = style.DrumColor;
 
-    // 创建 preTip 区域
-    var preTipGO = Instantiate(DrumsProfabs, drumRoot.transform);
-    preTipGO.name = "PreTipArea";
-    RectTransform preRect = preTipGO.GetComponent<RectTransform>();
-    preRect.anchorMin = new Vector2(0, 0.5f);
-    preRect.anchorMax = new Vector2(0, 0.5f);
-    preRect.pivot = new Vector2(1, 0.5f); // 右对齐 drum 左侧
-    preRect.localScale = Vector3.one;
-    preRect.anchoredPosition = new Vector2(drumX, 0); // 不变
-    preRect.sizeDelta = new Vector2(tipOffset * _PixelUnitsPerSecond, drumRect.sizeDelta.y);
+        var uiDrums = drumGO.GetComponent<UIAudioEditDrums>();
+        uiDrums.ThisTime = item;
+        uiDrums.Index = i;
 
-    var preUI = preTipGO.GetComponent<UIAudioEditDrums>();
-    preUI.SetColor(new Color(40f / 255f, 40f / 255f, 40f / 255f, 0.8f));
-    preUI.ThisTime = item - tipOffset;
-    preUI.Index = i;
-    uiDrums.SetColor(new Color(211f / 255f, 84f / 255f, 0f, 1f));
+        var preTipGO = Instantiate(DrumsProfabs, drumRoot.transform);
+        preTipGO.name = "PreTipArea";
+        var preRect = preTipGO.GetComponent<RectTransform>();
+        preRect.anchorMin = preRect.anchorMax = new Vector2(0, 0.5f);
+        preRect.pivot = new Vector2(1, 0.5f);
+        preRect.localScale = Vector3.one;
+        preRect.anchoredPosition = new Vector2(drumX, 0);
+        preRect.sizeDelta = new Vector2(tipOffset * _PixelUnitsPerSecond, drumRect.sizeDelta.y);
 
-    // 添加红色起始柱
-    GameObject startBar = new GameObject("StartBar", typeof(Image));
-    startBar.transform.SetParent(preTipGO.transform, false);
-    RectTransform startRect = startBar.GetComponent<RectTransform>();
-    startRect.anchorMin = new Vector2(0, 0.5f);
-    startRect.anchorMax = new Vector2(0, 0.5f);
-    startRect.pivot = new Vector2(0, 0.5f);
-    startRect.anchoredPosition = Vector2.zero;
-    startRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y); // 3f 为红柱宽度
-    startBar.GetComponent<Image>().color = Color.red;
+        var preImage = preTipGO.GetComponent<Image>();
+        if (preImage && style.PreTipSprite) preImage.sprite = style.PreTipSprite;
+        preImage.color = style.PreTipColor;
 
-    // 添加红色结束柱
-    GameObject endBar = new GameObject("EndBar", typeof(Image));
-    endBar.transform.SetParent(preTipGO.transform, false);
-    RectTransform endRect = endBar.GetComponent<RectTransform>();
-    endRect.anchorMin = new Vector2(1, 0.5f);
-    endRect.anchorMax = new Vector2(1, 0.5f);
-    endRect.pivot = new Vector2(1, 0.5f);
-    endRect.anchoredPosition = Vector2.zero;
-    endRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y);
-    endBar.GetComponent<Image>().color = Color.red;
+        var preUI = preTipGO.GetComponent<UIAudioEditDrums>();
+        preUI.ThisTime = item - tipOffset;
+        preUI.Index = i;
 
-    // 添加 root 到管理列表
-    DrumsUIInDrums.Add(drumRoot.gameObject);
-}
+        GameObject startBar = new GameObject("StartBar", typeof(Image));
+        startBar.transform.SetParent(preTipGO.transform, false);
+        var startRect = startBar.GetComponent<RectTransform>();
+        startRect.anchorMin = startRect.anchorMax = new Vector2(0, 0.5f);
+        startRect.pivot = new Vector2(0, 0.5f);
+        startRect.anchoredPosition = Vector2.zero;
+        startRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y);
+        startBar.GetComponent<Image>().color = Color.red;
 
+        GameObject endBar = new GameObject("EndBar", typeof(Image));
+        endBar.transform.SetParent(preTipGO.transform, false);
+        var endRect = endBar.GetComponent<RectTransform>();
+        endRect.anchorMin = endRect.anchorMax = new Vector2(1, 0.5f);
+        endRect.pivot = new Vector2(1, 0.5f);
+        endRect.anchoredPosition = Vector2.zero;
+        endRect.sizeDelta = new Vector2(3f, drumRect.sizeDelta.y);
+        endBar.GetComponent<Image>().color = Color.red;
 
+        DrumsUIInDrums.Add(drumRoot.gameObject);
+    }
 
     void StartLength()
     {
-        //��ʼ���������?
         float SongTime = this.SendQuery(new QueryAudioEditAudioClipLength());
         for (int i = 0; i < DrumsUI.Length; i++)
         {
@@ -233,29 +221,22 @@ void CreateDrumItemUI(float item, int i, Dictionary<float, List<DrumsLoadData>> 
         }
     }
 
-
     private void InputContller()
     {
         if (!editModel.Mode.Equals(SystemModeData.RecordingMode)) return;
-        if (InputSystems.Click)
-        {
-            AddDrwms(TheTypeOfOperation.Click);
-        }
-        if (InputSystems.SwipeUp)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeUp);
-        }
-        if (InputSystems.SwipeDown)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeDown);
-        }
-        if (InputSystems.SwipeLeft)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeLeft);
-        }
-        if (InputSystems.SwipeRight)
-        {
-            AddDrwms(TheTypeOfOperation.SwipeRight);
-        }
+
+        if (InputSystems.Click) AddDrwms(TheTypeOfOperation.Click);
+        if (InputSystems.SwipeUp) AddDrwms(TheTypeOfOperation.SwipeUp);
+        if (InputSystems.SwipeDown) AddDrwms(TheTypeOfOperation.SwipeDown);
+        if (InputSystems.SwipeLeft) AddDrwms(TheTypeOfOperation.SwipeLeft);
+        if (InputSystems.SwipeRight) AddDrwms(TheTypeOfOperation.SwipeRight);
     }
+
+    public void RemoveDrwms(int index = -1)
+    {
+        Debug.Log($"{editModel.ThisTime}");
+        this.SendCommand(new RemoveAudioEditTimeLineDataCommand(editModel.ThisTime, index));
+    }
+
+    public void PlayAllDrwmsUI() { }
 }

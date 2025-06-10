@@ -151,6 +151,7 @@ public class UIDrawAScale : MonoBehaviour, IController
         clickEntry.callback.AddListener((data) =>
         {
             this.SendCommand(new SetAudioEditThisTimeCommand(tCopy));
+            FindObjectOfType<CreateDrumsManager>()?.ResetAllActiveCenters(); // 清空标记 局限在谱面编辑中可以重新设置InputMode //2025/06/10 - mixyao
         });
         eventTrigger.triggers.Add(clickEntry);
 

@@ -27,8 +27,10 @@ public class InputMode : MonoBehaviour, IController
     [SerializeField]
     AudioClip _LoseClip;
     public AudioClip LoseClip { get { return _LoseClip; } set { _LoseClip = value; } }
-   
+
     public SpriteRenderer SpriteRenderer;
+    public bool IsActive = true; // 当前是否“被激活”
+
     private void OnEnable()
     {
         TimeOfExistence = 0;
@@ -36,22 +38,16 @@ public class InputMode : MonoBehaviour, IController
     void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
-        StartTime = editModel.ThisTime + drwmsData.DrwmsData.VPreAdventAudioClipOffsetTime;
-        if (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence > editModel.EditAudioClip.length)
-        {
-            EndTime = editModel.ThisTime + (editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence - editModel.EditAudioClip.length);
-            return;
-        }
-        else
-        {
-        EndTime = editModel.ThisTime + drwmsData.DrwmsData.VTimeOfExistence;
 
-        }
-        
-            float shift = (EndTime - StartTime) / 2f;
-    StartTime -= shift;
-    EndTime -= shift;
+        float centerTime = drwmsData.DrwmsData.CenterTime;
+        float existence = drwmsData.DrwmsData.VTimeOfExistence;
+
+        StartTime = centerTime - existence / 2f;
+        EndTime = centerTime + existence / 2f;
     }
+
+
+
     void Start()
     {
         Init();
@@ -140,14 +136,14 @@ public class InputMode : MonoBehaviour, IController
     void Succeed()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip },new float[] { drwmsData.MusicData.SSucceedVolume });
+        AudioEditManager.Instance.Play(new AudioClip[] { _SucceedClip }, new float[] { drwmsData.MusicData.SSucceedVolume });
         this.SendEvent<SucceedTrigger>();
         Destroy(gameObject);
     }
     void Lose()
     {
         if (!editModel.Mode.Equals(SystemModeData.PlayMode)) return;
-        AudioEditManager.Instance.Play(new AudioClip[]{ _LoseClip}, new float[] { drwmsData.MusicData.SLoseVolume });
+        AudioEditManager.Instance.Play(new AudioClip[] { _LoseClip }, new float[] { drwmsData.MusicData.SLoseVolume });
         this.SendEvent<LoseTrigger>();
         Destroy(gameObject);
     }
@@ -169,13 +165,13 @@ public class InputMode : MonoBehaviour, IController
 
 public enum TheTypeOfOperation
 {
-  SwipeUp,    
-  SwipeDown,    
-  SwipeLeft,    
-  SwipeRight,
-  Click
+    SwipeUp,
+    SwipeDown,
+    SwipeLeft,
+    SwipeRight,
+    Click
 
-  
+
 
 
 }
