@@ -19,6 +19,8 @@ public class CreateDrumsManager : ManagerBase
     // 已实例化鼓点的中心时间（防止重复创建）
     private HashSet<float> activeDrumCenters = new();
 
+    public IReadOnlyList<InputMode> ActiveInputModes => gameObjects; //解决鼓点重叠问题 !改为了统一管理鼓点的判定! 2025/06/13 - mixyao
+
     public override void Init()
     {
         editModel = this.GetModel<AudioEditModel>();
@@ -93,7 +95,6 @@ public class CreateDrumsManager : ManagerBase
     public void ResetAllActiveCenters()
     {
         activeDrumCenters.Clear();
-        Debug.Log("[CreateDrumsManager] 所有 activeDrumCenters 已清空。");
     }
 
 
