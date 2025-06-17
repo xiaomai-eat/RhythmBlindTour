@@ -16,12 +16,21 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
     public Transform ContentRoot;
     private AudioEditModel editModel;
     private List<DrumRow> rows = new();
+    private Dictionary<DrumsLoadData, int> drumIdLookup = new();
+
+    public enum SortMode
+    {
+        ByIndex,
+        ByTime
+    }
+
+    public SortMode currentPrimaryMode = SortMode.ByIndex;
+    public bool typeSortEnabled = false;
 
     void Start()
     {
         StartCoroutine(InitEditModelIfNeeded());
 
-        // 注册时间针变更事件（仅非PlayMode生效）
         this.RegisterEvent<OnUpdateThisTime>(OnTimeNeedCheck)
             .UnRegisterWhenGameObjectDestroyed(gameObject);
     }
@@ -74,17 +83,26 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
             Destroy(row.GameObject);
         rows.Clear();
 
-        int counter = 1;
         var timeDict = editModel.TimeLineData;
+        drumIdLookup.Clear();
 
-        // 统计重复时间（以 0.00 格式）
-        Dictionary<string, int> timeTextCount = new();
+        List<(float time, int index, DrumsLoadData data)> allDrums = new();
         foreach (var time in timeDict.Keys)
         {
-            string timeStr = Math.Round(time, 2).ToString("0.00");
-            if (!timeTextCount.ContainsKey(timeStr))
-                timeTextCount[timeStr] = 0;
-            timeTextCount[timeStr] += timeDict[time].Count;
+            var list = timeDict[time];
+            for (int i = 0; i < list.Count; i++)
+            {
+                drumIdLookup[list[i]] = drumIdLookup.Count + 1;
+                allDrums.Add((time, i, list[i]));
+            }
+        }
+
+        Dictionary<string, int> timeTextCount = new();
+        foreach (var d in allDrums)
+        {
+            string timeStr = Math.Round(d.time, 2).ToString("0.00");
+            if (!timeTextCount.ContainsKey(timeStr)) timeTextCount[timeStr] = 0;
+            timeTextCount[timeStr]++;
         }
 
         HashSet<string> duplicatedTimeStrings = new();
@@ -94,41 +112,60 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
                 duplicatedTimeStrings.Add(kv.Key);
         }
 
-        foreach (var time in new List<float>(timeDict.Keys))
+        allDrums.Sort((a, b) =>
         {
-            float roundedTime = (float)Math.Round(time, 2, MidpointRounding.ToEven);
+            int result = 0;
+
+            if (typeSortEnabled)
+            {
+                result = GetTypeOrder(a.data.DrwmsData.DtheTypeOfOperation)
+                         .CompareTo(GetTypeOrder(b.data.DrwmsData.DtheTypeOfOperation));
+                if (result != 0) return result;
+            }
+
+            if (currentPrimaryMode == SortMode.ByTime)
+            {
+                result = a.time.CompareTo(b.time);
+                if (result == 0)
+                    result = drumIdLookup[a.data].CompareTo(drumIdLookup[b.data]);
+            }
+            else
+            {
+                result = drumIdLookup[a.data].CompareTo(drumIdLookup[b.data]);
+            }
+
+            return result;
+        });
+
+        foreach (var d in allDrums)
+        {
+            float roundedTime = (float)Math.Round(d.time, 2);
             string timeStr = roundedTime.ToString("0.00");
 
-            var drumList = timeDict[time];
+            var go = Instantiate(ItemPrefab, ContentRoot);
+            var row = new DrumRow(go, drumIdLookup[d.data], roundedTime, d.data.DrwmsData.DtheTypeOfOperation);
 
-            for (int i = 0; i < drumList.Count; i++)
-            {
-                var data = drumList[i];
-                var go = Instantiate(ItemPrefab, ContentRoot);
-                int localIndex = i;
+            float localTime = roundedTime;
+            int localIndex = d.index;
 
-                var row = new DrumRow(go, counter++, roundedTime, data.DrwmsData.DtheTypeOfOperation);
-
-                row.Init(
-                    onDelete: () => row.SetPendingDelete(true),
-                    onUndo: () => row.SetPendingDelete(false),
-                    onConfirm: () =>
-                    {
-                        this.SendCommand(new RemoveAudioEditTimeLineDataCommand(roundedTime, localIndex));
-                        RefreshList();
-                    }
-                );
-
-                if (duplicatedTimeStrings.Contains(timeStr))
+            row.Init(
+                onDelete: () => row.SetPendingDelete(true),
+                onUndo: () => row.SetPendingDelete(false),
+                onConfirm: () =>
                 {
-                    row.MarkAsDuplicatedTime();
+                    this.SendCommand(new RemoveAudioEditTimeLineDataCommand(localTime, localIndex));
+                    RefreshList();
                 }
+            );
 
-                rows.Add(row);
+            if (duplicatedTimeStrings.Contains(timeStr))
+            {
+                row.MarkAsDuplicatedTime();
             }
+
+            rows.Add(row);
         }
 
-        // 初次刷新时同步一次当前高亮（如果不是PlayMode）
         if (editModel.Mode != SystemModeData.PlayMode)
         {
             OnTimeNeedCheck(new OnUpdateThisTime() { ThisTime = editModel.ThisTime });
@@ -152,7 +189,6 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
         public GameObject GameObject;
         TMP_Text IndexText, TimeText, TypeText;
         Button ActionButton, UndoButton, ConfirmButton;
-        Image Background;
 
         bool isDuplicatedTime = false;
         bool isDeleted = false;
@@ -162,21 +198,13 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
         {
             GameObject = go;
 
-            Transform tIndex = go.transform.Find("Index");
-            Transform tTime = go.transform.Find("Time");
-            Transform tType = go.transform.Find("Type");
-            Transform tDel = go.transform.Find("DeleteBtn");
-            Transform tUndo = go.transform.Find("UndoBtn");
-            Transform tConfirm = go.transform.Find("ConfirmBtn");
+            IndexText = go.transform.Find("Index")?.GetComponent<TMP_Text>();
+            TimeText = go.transform.Find("Time")?.GetComponent<TMP_Text>();
+            TypeText = go.transform.Find("Type")?.GetComponent<TMP_Text>();
 
-            IndexText = tIndex?.GetComponent<TMP_Text>();
-            TimeText = tTime?.GetComponent<TMP_Text>();
-            TypeText = tType?.GetComponent<TMP_Text>();
-
-            ActionButton = tDel?.GetComponent<Button>();
-            UndoButton = tUndo?.GetComponent<Button>();
-            ConfirmButton = tConfirm?.GetComponent<Button>();
-            Background = go.GetComponent<Image>();
+            ActionButton = go.transform.Find("DeleteBtn")?.GetComponent<Button>();
+            UndoButton = go.transform.Find("UndoBtn")?.GetComponent<Button>();
+            ConfirmButton = go.transform.Find("ConfirmBtn")?.GetComponent<Button>();
 
             IndexText.text = index.ToString("D3");
             TimeText.text = time.ToString("0.00");
@@ -274,6 +302,34 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
             _ => "未知"
         };
     }
+
+    public void SortByIndex()
+    {
+        currentPrimaryMode = SortMode.ByIndex;
+        RefreshList();
+    }
+
+    public void SortByTime()
+    {
+        currentPrimaryMode = SortMode.ByTime;
+        RefreshList();
+    }
+
+    public void ToggleTypeSort()
+    {
+        typeSortEnabled = !typeSortEnabled;
+        RefreshList();
+    }
+
+    int GetTypeOrder(TheTypeOfOperation op) => op switch
+    {
+        TheTypeOfOperation.Click => 0,
+        TheTypeOfOperation.SwipeLeft => 1,
+        TheTypeOfOperation.SwipeRight => 2,
+        TheTypeOfOperation.SwipeUp => 3,
+        TheTypeOfOperation.SwipeDown => 4,
+        _ => 99
+    };
 
     public IArchitecture GetArchitecture() => GameBody.Interface;
 }
