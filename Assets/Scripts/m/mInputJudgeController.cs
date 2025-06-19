@@ -31,33 +31,65 @@ public class mInputJudgeController : MonoBehaviour
 
         if (!inputConsumedThisFrame && InputSystems.PlayClick)
         {
-            HandleFirstLose();
+            HandleFirstLose(); // 输入无响应时自动处理失败鼓点
         }
     }
 
-    void TryHandle(TheTypeOfOperation type, bool inputTriggered)
+    void TryHandle(TheTypeOfOperation inputType, bool inputTriggered)
     {
         if (!inputTriggered || inputConsumedThisFrame)
             return;
 
-        var candidates = drumsManager.ActiveInputModes
+        var activeModes = drumsManager.ActiveInputModes
             .Where(x => x != null && x.IsActive)
+            .ToList();
+
+        float now = editModel.ThisTime;
+
+        // 1. 正确优先：类型匹配的鼓点（先尝试匹配）
+        var matching = activeModes
+            .Where(x => x.GetOperation() == inputType)
             .OrderBy(x => x.StartTime)
             .ToList();
 
-        var matched = candidates
-            .Where(x => x.GetOperation() == type)
-            .ToList();
-
-        if (matched.Count > 0)
+        foreach (var mode in matching)
         {
-            var first = matched.First();
-            first.SucceedByManager();
-            first.IsActive = false;
+            if (mode.ReceiveInput(inputType))
+            {
+                mode.IsActive = false;
+                inputConsumedThisFrame = true;
+                return;
+            }
 
-            inputConsumedThisFrame = true;
+            if (mode.HasJudged)
+            {
+                mode.IsActive = false;
+                inputConsumedThisFrame = true;
+                return;
+            }
+        }
+
+        // 2. 错误输入：只处理 StartTime 最早的鼓点，但仅当 now >= StartTime
+        var earliest = activeModes
+            .OrderBy(x => x.StartTime)
+            .FirstOrDefault();
+
+        if (earliest != null && now >= earliest.StartTime)
+        {
+            bool result = earliest.ReceiveInput(inputType);
+
+            if (result || earliest.HasJudged)
+            {
+                earliest.IsActive = false;
+                inputConsumedThisFrame = true;
+            }
         }
     }
+
+
+
+
+
 
     void HandleFirstLose()
     {
@@ -66,13 +98,22 @@ public class mInputJudgeController : MonoBehaviour
             .OrderBy(x => x.StartTime)
             .ToList();
 
-        if (fallback.Count > 0)
-        {
-            var first = fallback.First();
-            first.LoseByManager();
-            first.IsActive = false;
+        float now = editModel.ThisTime;
 
+        foreach (var mode in fallback)
+        {
+            if (now < mode.StartTime)
+                continue; // ⛔ 尚未进入判定时间，不能处理
+
+            if (now > mode.EndTime)
+                continue; // ✅ 超时由 InputMode 自动处理
+
+            // ✅ 已进入 StartTime 区间，但未被触发 → 判定为失败
+            mode.LoseByManager();
+            mode.IsActive = false;
             inputConsumedThisFrame = true;
+            break;
         }
     }
+
 }
