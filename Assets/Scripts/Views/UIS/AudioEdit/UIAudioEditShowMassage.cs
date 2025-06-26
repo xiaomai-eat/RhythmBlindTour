@@ -49,16 +49,16 @@ public class UIAudioEditShowMassage : MonoBehaviour, IController
         });
         this.RegisterEvent<OnEditMode>(v =>
         {
-            _ModeShow.text = "�༭ģʽ";
+            _ModeShow.text = "编辑模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnPlayMode>(v =>
         {
-            _ModeShow.text = "����ģʽ";
+            _ModeShow.text = "游玩模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
 
         this.RegisterEvent<OnRecordingMode>(v =>
         {
-            _ModeShow.text = "¼��ģʽ";
+            _ModeShow.text = "录制模式";
         }).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {

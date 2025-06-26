@@ -52,7 +52,7 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
         TimeHand.anchoredPosition = new Vector2(newTime * _PixelUnitsPerSecond, 0);
         ShowTimes.text = newTime.ToString("0.00");
     }
-    int mode = 0;//�����ģʽָ:ʱ��������ӻ�ɾ��ģʽ
+    int mode = 0;
     float Speed;
     float PressTime;
     private void Update()

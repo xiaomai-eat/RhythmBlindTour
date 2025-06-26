@@ -10,6 +10,7 @@ using Qf.Events;
 using Qf.Models;
 using Qf.Models.AudioEdit;
 using QFramework;
+using Unity.Burst.Intrinsics;
 
 public class UIAttributeSetPanel : MonoBehaviour, IController
 {
@@ -30,6 +31,7 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
     [SerializeField] UIValueAttribute PreAdventAudioClipOffsetTime;
     [SerializeField] UIValueAttribute CenterTimeAttribute;
     [SerializeField] UIValueAttribute PreAdventAbsoluteTime;
+    [SerializeField] mUIButtonAttribute IsDemoDrumButton;
     [SerializeField] Button MoveForwardButton;
     [SerializeField] Button MoveBackwardButton;
     [SerializeField] Button RemoveButton;
@@ -157,6 +159,10 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
         ls = editModel.TimeLineData[thisTime][index];
         UpdateDataShow(ls);
 
+        // IsDemoDrumButton.SetAction(v =>
+        // {
+
+        // });
         CenterTimeAttribute.SetAction(v =>
         {
             if (!float.TryParse(v.ToString(), out float newCenterTime)) return;

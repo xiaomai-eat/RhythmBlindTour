@@ -4,8 +4,8 @@ using Qf.Models.AudioEdit;
 [RequireComponent(typeof(InputMode))]
 public class mInputModeVisualController : MonoBehaviour
 {
-    public Transform judgeLineTarget;         // 判定基准线（只用于方向）
-    public Transform judgmentBarTransform;    // 用于显示判定区间的物体（横向拉长）
+    public Transform judgeLineTarget;
+    public Transform judgmentBarTransform;
 
     private InputMode inputMode;
     private AudioEditModel editModel;
@@ -13,6 +13,24 @@ public class mInputModeVisualController : MonoBehaviour
     private Vector3 moveDirection;
     private float moveSpeedPerSecond;
     private float distanceToMove;
+
+    public static event System.Action<bool> OnPauseInputModeVisual;
+
+    private void OnEnable()
+    {
+        OnPauseInputModeVisual += HandlePauseEvent;
+    }
+
+    private void OnDisable()
+    {
+        OnPauseInputModeVisual -= HandlePauseEvent;
+    }
+
+    private void HandlePauseEvent(bool pause)
+    {
+        if (inputMode != null)
+            inputMode.PauseAutoFail = pause;
+    }
 
     void Start()
     {
@@ -25,12 +43,10 @@ public class mInputModeVisualController : MonoBehaviour
         distanceToMove = targetPos.x - currentPos.x;
         moveDirection = distanceToMove >= 0 ? Vector3.right : Vector3.left;
 
-        // 修正为：鼓点中心时间（centerTime）抵达判定线
         float centerTime = (inputMode.StartTime + inputMode.EndTime) / 2f;
         float timeToReachCenter = centerTime - inputMode.PreAdventTime;
         moveSpeedPerSecond = Mathf.Abs(distanceToMove) / timeToReachCenter;
 
-        // 设置“判定区间”长度（EndTime - StartTime）对应的横向视觉长度
         float judgmentDuration = inputMode.EndTime - inputMode.StartTime;
         float barLength = moveSpeedPerSecond * judgmentDuration;
 
@@ -42,13 +58,20 @@ public class mInputModeVisualController : MonoBehaviour
         }
     }
 
-
     void FixedUpdate()
     {
-        if (inputMode == null || inputMode.HasJudged)
+        if (inputMode == null || inputMode.HasJudged || inputMode.PauseAutoFail)
             return;
 
         float deltaMove = moveSpeedPerSecond * Time.fixedDeltaTime;
         transform.position += moveDirection * deltaMove;
+    }
+
+    /// <summary>
+    /// 外部调用这个方法，触发所有 InputMode 的暂停/继续
+    /// </summary>
+    public static void BroadcastPauseToAll(bool pause)
+    {
+        OnPauseInputModeVisual?.Invoke(pause);
     }
 }

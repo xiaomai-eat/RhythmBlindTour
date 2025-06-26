@@ -34,6 +34,19 @@ public class mInputJudgeController : MonoBehaviour
             HandleFirstLose(); // 输入无响应时自动处理失败鼓点
         }
     }
+    public void PauseAllInputModeAutoFail(bool pause)
+    {
+        if (drumsManager == null || drumsManager.ActiveInputModes == null)
+            return;
+
+        foreach (var mode in drumsManager.ActiveInputModes)
+        {
+            if (mode != null)
+                mode.PauseAutoFail = pause;
+        }
+
+        Debug.Log($"[mInputJudgeController] 所有 InputMode 自动失败判断已{(pause ? "暂停" : "恢复")}");
+    }
 
     void TryHandle(TheTypeOfOperation inputType, bool inputTriggered)
     {

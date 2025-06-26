@@ -5,18 +5,20 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
+public class UIAudioEditDrums : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField]
     Image image;
     public float ThisTime;
     public int Index;
+    public bool IsTip = false;
+
     UIAudioEditTimeHand timeHand;
 
     void Awake()
-{
-    timeHand = FindObjectOfType<UIAudioEditTimeHand>();
-}
+    {
+        timeHand = FindObjectOfType<UIAudioEditTimeHand>();
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -34,4 +36,5 @@ public class UIAudioEditDrums : MonoBehaviour,IPointerClickHandler
     {
         timeHand.SetTime(this.ThisTime); //点击鼓点快速移动指针到鼓点位置 2025/06/10 - mixyao
     }
+
 }

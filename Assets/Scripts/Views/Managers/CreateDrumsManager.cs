@@ -112,20 +112,28 @@ public class CreateDrumsManager : ManagerBase
         float endTime = centerTime + existence / 2f;
         float preAdventTime = centerTime - preOffset;
 
+        // 初始化时间设置
         mode.InitializeTimes(preAdventTime, startTime, endTime);
+
+        // 设置是否为 Demo 鼓点
+        mode.SetIsDemoInputMode(Mathf.Approximately(existence, 0f));
+
         mode.DrwmsData = drumsLoadData;
         mode.SetOperation(operation);
 
+        // 设置音效
         mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FPreAdventAudioClipPath);
         mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FLoseAudioClipPath);
         mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FSucceedAudioClipPath);
 
+        // 设置可视化控制器
         var visualController = gameObject.GetComponent<mInputModeVisualController>();
         if (visualController != null && judgeLineTransform != null)
         {
             visualController.judgeLineTarget = judgeLineTransform;
         }
 
+        // 设置返回实例
         CreateSetClass.Instance.SetInputMode(mode);
 
         this.SendEvent(new DrumsGenerate()
@@ -135,6 +143,7 @@ public class CreateDrumsManager : ManagerBase
 
         return CreateSetClass.Instance;
     }
+
 
 
     public class CreateSetClass
