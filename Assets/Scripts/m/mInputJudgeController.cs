@@ -116,12 +116,12 @@ public class mInputJudgeController : MonoBehaviour
         foreach (var mode in fallback)
         {
             if (now < mode.StartTime)
-                continue; // ⛔ 尚未进入判定时间，不能处理
+                continue; // 尚未进入判定时间，不能处理
 
             if (now > mode.EndTime)
-                continue; // ✅ 超时由 InputMode 自动处理
+                continue; // 超时由 InputMode 自动处理
 
-            // ✅ 已进入 StartTime 区间，但未被触发 → 判定为失败
+            // 已进入 StartTime 区间，但未被触发 → 判定为失败
             mode.LoseByManager();
             mode.IsActive = false;
             inputConsumedThisFrame = true;

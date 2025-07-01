@@ -30,37 +30,68 @@ public class CreateDrumsManager : ManagerBase
 
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
-            if (editModel.TipsAudio.ContainsKey(v.ThisTime))
+            // PlayMode 下播放预告音和生成鼓点
+            if (editModel.Mode.Equals(SystemModeData.PlayMode))
             {
-                if (editModel.Mode.Equals(SystemModeData.PlayMode))
-                    AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray(), editModel.TipsVolume[v.ThisTime].ToArray());
-            }
-
-            if (editModel.TimeLineData != null)
-            {
-                foreach (var kvp in editModel.TimeLineData)
+                if (editModel.TipsAudio.ContainsKey(v.ThisTime))
                 {
-                    float centerTime = kvp.Key;
+                    AudioEditManager.Instance.Play(editModel.TipsAudio[v.ThisTime].ToArray(), editModel.TipsVolume[v.ThisTime].ToArray());
+                }
 
-                    foreach (var data in kvp.Value)
+                if (editModel.TimeLineData != null)
+                {
+                    foreach (var kvp in editModel.TimeLineData)
                     {
-                        float existence = data.DrwmsData.VTimeOfExistence;
-                        float preAdventOffset = data.DrwmsData.VPreAdventAudioClipOffsetTime;
-                        float preAdventTime = centerTime - preAdventOffset;
+                        float centerTime = kvp.Key;
 
-                        if (v.ThisTime >= preAdventTime && !activeDrumCenters.Contains(centerTime))
+                        foreach (var data in kvp.Value)
                         {
-                            var inputMode = CreateDrums(data.DrwmsData.DtheTypeOfOperation, data).GetInputMode();
-                            gameObjects.Add(inputMode);
-                            activeDrumCenters.Add(centerTime);
+                            float existence = data.DrwmsData.VTimeOfExistence;
+                            float preAdventOffset = data.DrwmsData.VPreAdventAudioClipOffsetTime;
+                            float preAdventTime = centerTime - preAdventOffset;
+
+                            if (v.ThisTime >= preAdventTime && !activeDrumCenters.Contains(centerTime))
+                            {
+                                var inputMode = CreateDrums(data.DrwmsData.DtheTypeOfOperation, data).GetInputMode();
+                                gameObjects.Add(inputMode);
+                                activeDrumCenters.Add(centerTime);
+                            }
                         }
                     }
                 }
             }
 
-            // 编辑模式鼓点清理
-            if (!editModel.Mode.Equals(SystemModeData.PlayMode))
+            // 非播放模式：试听预告音和主音
+            else
             {
+                if (editModel.TimeLineData != null)
+                {
+                    foreach (var kvp in editModel.TimeLineData)
+                    {
+                        float centerTime = kvp.Key;
+
+                        foreach (var data in kvp.Value)
+                        {
+                            float preAdventTime = centerTime - data.DrwmsData.VPreAdventAudioClipOffsetTime;
+
+                            if (Mathf.Approximately(v.ThisTime, preAdventTime))
+                            {
+                                var clip = cachingModel.GetAudioClip(data.DrwmsData.FPreAdventAudioClipPath);
+                                if (clip != null) audioSource.PlayOneShot(clip);
+                            }
+
+                            if (Mathf.Approximately(v.ThisTime, centerTime))
+                            {
+                                var clip = cachingModel.GetAudioClip(data.DrwmsData.FSucceedAudioClipPath);
+                                if (clip != null) audioSource.PlayOneShot(clip);
+                            }
+
+
+                        }
+                    }
+                }
+
+                // 编辑模式鼓点清理
                 List<InputMode> toRemove = new();
 
                 foreach (var j in gameObjects)
@@ -93,7 +124,6 @@ public class CreateDrumsManager : ManagerBase
     {
         GameObject gameObject = Instantiate(Resources.Load<GameObject>(PathConfig.ProfabsOath + "InputMode"));
 
-        // 设置父物体为 InputModePoint
         if (inputModeParent != null)
             gameObject.transform.SetParent(inputModeParent, worldPositionStays: false);
 
@@ -112,28 +142,21 @@ public class CreateDrumsManager : ManagerBase
         float endTime = centerTime + existence / 2f;
         float preAdventTime = centerTime - preOffset;
 
-        // 初始化时间设置
         mode.InitializeTimes(preAdventTime, startTime, endTime);
-
-        // 设置是否为 Demo 鼓点
         mode.SetIsDemoInputMode(Mathf.Approximately(existence, 0f));
-
         mode.DrwmsData = drumsLoadData;
         mode.SetOperation(operation);
 
-        // 设置音效
         mode.PreAdventClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FPreAdventAudioClipPath);
         mode.LoseClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FLoseAudioClipPath);
         mode.SuccessClip = cachingModel.GetAudioClip(drumsLoadData.DrwmsData.FSucceedAudioClipPath);
 
-        // 设置可视化控制器
         var visualController = gameObject.GetComponent<mInputModeVisualController>();
         if (visualController != null && judgeLineTransform != null)
         {
             visualController.judgeLineTarget = judgeLineTransform;
         }
 
-        // 设置返回实例
         CreateSetClass.Instance.SetInputMode(mode);
 
         this.SendEvent(new DrumsGenerate()
@@ -144,12 +167,11 @@ public class CreateDrumsManager : ManagerBase
         return CreateSetClass.Instance;
     }
 
-
-
     public class CreateSetClass
     {
         AudioSource _AudioSource;
         InputMode _Mode;
+
         public CreateSetClass() { }
         public CreateSetClass(AudioSource audioSource)
         {

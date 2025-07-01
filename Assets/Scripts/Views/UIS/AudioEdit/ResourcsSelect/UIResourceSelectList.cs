@@ -23,7 +23,7 @@ public class UIResourceSelectList : MonoBehaviour, IController
         currentClips.Clear();
         currentClips.AddRange(clips);
 
-        // ✅ 彻底清空 ObjectParent 下的所有子物体（不依赖 _UIItems 列表）
+        //  彻底清空 ObjectParent 下的所有子物体（不依赖 _UIItems 列表）
         for (int i = ObjectParent.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(ObjectParent.transform.GetChild(i).gameObject);

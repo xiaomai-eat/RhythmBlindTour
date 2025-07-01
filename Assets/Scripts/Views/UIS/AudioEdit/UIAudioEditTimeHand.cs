@@ -17,8 +17,8 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     TMP_Text ShowTimes;
     [SerializeField]
     ScrollRect ScrollRect;
-    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;//ÿ�����ص�λ
-    int _EditHeight = AudioEditConfig.EditHeight;//�༭���ɱ༭��Χ�߶�
+    int _PixelUnitsPerSecond = AudioEditConfig.PixelUnitsPerSecond;
+    int _EditHeight = AudioEditConfig.EditHeight;
     public Vector2 TimeHandPos
     {
         get
@@ -85,24 +85,26 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
             }
         }
         #endregion
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            RemoveTime(1);
-            RemoveTimeMode(1);
-        }
-        if (Input.GetKeyUp(KeyCode.LeftArrow))
-        {
-            StopTimeMode(0);
-        }
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            AddTime(1);
-            AddTimeMode(1);
-        }
-        if (Input.GetKeyUp(KeyCode.RightArrow))
-        {
-            StopTimeMode(0);
-        }
+
+        // [inputSystem 重新规划] -- mixyao/25/07/02
+        // if (Input.GetKeyDown(KeyCode.LeftArrow))
+        // {
+        //     RemoveTime(1);
+        //     RemoveTimeMode(1);
+        // }
+        // if (Input.GetKeyUp(KeyCode.LeftArrow))
+        // {
+        //     StopTimeMode(0);
+        // }
+        // if (Input.GetKeyDown(KeyCode.RightArrow))
+        // {
+        //     AddTime(1);
+        //     AddTimeMode(1);
+        // }
+        // if (Input.GetKeyUp(KeyCode.RightArrow))
+        // {
+        //     StopTimeMode(0);
+        // }
     }
     public void AddTimeMode(float Speed)
     {

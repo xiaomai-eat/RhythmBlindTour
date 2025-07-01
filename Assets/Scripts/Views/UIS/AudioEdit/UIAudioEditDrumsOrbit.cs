@@ -2,6 +2,8 @@ using Assets.Scripts.Querys.AudioEdit;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Commands.AudioEdit;
 using Qf.Events;
+using Qf.Managers;
+using Qf.Models;
 using Qf.Models.AudioEdit;
 using Qf.Querys.AudioEdit;
 using Qf.Systems;
@@ -21,6 +23,7 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
         public Sprite DrumSprite;
         public Sprite PreTipSprite;
     }
+    [SerializeField] private AudioSource audioSource; // 音效试听
 
     [SerializeField]
     private List<TrackStyle> trackStyles = new(); // 轨道样式
@@ -138,7 +141,20 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
         };
 
         this.SendCommand(new AddAudioEditTimeLineDataCommand(centerTime, newDrums));
+
+        // 播放试听音效（使用 cachingModel + audioSource）
+        if (isCenterCreate)
+        {
+            var clip = this.GetModel<DataCachingModel>().GetAudioClip(succeedClip?.name);
+            if (clip != null) audioSource.PlayOneShot(clip);
+        }
+        else
+        {
+            var clip = this.GetModel<DataCachingModel>().GetAudioClip(tipClip?.name);
+            if (clip != null) audioSource.PlayOneShot(clip);
+        }
     }
+
 
 
     void UpDateDrwmsUI() => UpDateAllDrwmsUI();
@@ -219,7 +235,7 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
         var preImage = preTipGO.GetComponent<Image>();
         if (preImage && style.PreTipSprite) preImage.sprite = style.PreTipSprite;
 
-        // ✅ 设置 Tip 区域颜色（含 Demo 鼓点高亮处理）
+        //  设置 Tip 区域颜色（含 Demo 鼓点高亮处理）
         Color tipColor;
         if (Mathf.Approximately(existence, 0f))
         {
@@ -282,18 +298,30 @@ public class UIAudioEditDrumsOrbit : MonoBehaviour, IController
     {
         if (!editModel.Mode.Equals(SystemModeData.RecordingMode)) return;
 
+        // [ControlRun 状态下跳过刷新] --mixyao/25/07/02
+        if (AudioEditManager.Instance != null && AudioEditManager.Instance.IsControlRunning)
+        {
+            if (InputSystems.Click) AddDrwms(TheTypeOfOperation.Click);
+            if (InputSystems.SwipeUp) AddDrwms(TheTypeOfOperation.SwipeUp);
+            if (InputSystems.SwipeDown) AddDrwms(TheTypeOfOperation.SwipeDown);
+            if (InputSystems.SwipeLeft) AddDrwms(TheTypeOfOperation.SwipeLeft);
+            if (InputSystems.SwipeRight) AddDrwms(TheTypeOfOperation.SwipeRight);
+            return;
+        }
+
+        // 普通录制状态下允许刷新
         if (InputSystems.Click) AddDrwms(TheTypeOfOperation.Click);
         if (InputSystems.SwipeUp) AddDrwms(TheTypeOfOperation.SwipeUp);
         if (InputSystems.SwipeDown) AddDrwms(TheTypeOfOperation.SwipeDown);
         if (InputSystems.SwipeLeft) AddDrwms(TheTypeOfOperation.SwipeLeft);
         if (InputSystems.SwipeRight) AddDrwms(TheTypeOfOperation.SwipeRight);
 
-        // 添加刷新列表的方法
         if (drumsInspectorPanel != null)
         {
             drumsInspectorPanel.RefreshList();
         }
     }
+
 
     public void RemoveDrwms(int index = -1)
     {

@@ -25,7 +25,7 @@ public class mModeButtonsController : MonoBehaviour, IController
         this.RegisterEvent<OnPlayMode>(v => SetSelectedMode(1)).UnRegisterWhenGameObjectDestroyed(gameObject);
         this.RegisterEvent<OnRecordingMode>(v => SetSelectedMode(2)).UnRegisterWhenGameObjectDestroyed(gameObject);
 
-        // ✅ 初始设置为 EditMode
+        // 初始设置为 EditMode
         AudioEditManager.Instance?.EnterEditMode(); // 触发模式切换逻辑
         SetSelectedMode(0);                         // 设置按钮视觉为选中 Edit
     }

@@ -28,6 +28,11 @@ namespace Qf.Managers
         int Mode;
         public static AudioEditManager Instance;
         private CreateDrumsManager drumsManager;
+
+
+        // [曝露 ControlRun 的激活状态] --mixyao/25/07/02
+        public bool IsControlRunning => editModel.Mode == SystemModeData.RecordingMode && audioSource != null && audioSource.isPlaying;
+
         /// <summary>
         /// 播放特效音
         /// </summary>
