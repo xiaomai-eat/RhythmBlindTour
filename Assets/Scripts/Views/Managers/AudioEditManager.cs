@@ -31,7 +31,7 @@ namespace Qf.Managers
 
 
         // [曝露 ControlRun 的激活状态] --mixyao/25/07/02
-        public bool IsControlRunning => editModel.Mode == SystemModeData.RecordingMode && audioSource != null && audioSource.isPlaying;
+        public bool IsControlRunning => audioSource != null && audioSource.isPlaying;
 
         /// <summary>
         /// 播放特效音

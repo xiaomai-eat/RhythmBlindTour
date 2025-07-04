@@ -73,18 +73,23 @@ namespace Qf.Systems
             Vertical = Input.GetAxis("Vertical");
         }
 
-        bool InputQuery(string keyName, bool and = false)
+        public static bool InputQuery(string keyName, bool and = false)
         {
+            if (!keyValuePairs.ContainsKey(keyName)) return false;
+
             if (keyCacheThisFrame.ContainsKey(keyName))
                 return keyCacheThisFrame[keyName];
 
             bool result = false;
 
-            if (!keyValuePairs.ContainsKey(keyName)) return false;
-
             var keys = keyValuePairs[keyName];
+            if (keys == null || keys.Count == 0)
+            {
+                keyCacheThisFrame[keyName] = false;
+                return false;
+            }
 
-            if (keys.Count <= 1)
+            if (keys.Count == 1)
             {
                 result = Input.GetKeyDown(keys[0]);
             }
@@ -180,7 +185,6 @@ namespace Qf.Systems
         {
             if (!keyValuePairs.ContainsKey(keyName))
             {
-                Debug.LogError("操作不存在，请先使用 AddKey 创建");
                 return;
             }
             keyValuePairs[keyName].Clear();

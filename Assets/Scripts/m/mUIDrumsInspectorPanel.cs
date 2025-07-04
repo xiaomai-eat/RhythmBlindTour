@@ -9,6 +9,7 @@ using QFramework;
 using Qf.ClassDatas.AudioEdit;
 using Qf.Commands.AudioEdit;
 using Qf.Events;
+using Qf.Managers;
 
 public class mUIDrumsInspectorPanel : MonoBehaviour, IController
 {
@@ -73,6 +74,7 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
 
     public void RefreshList()
     {
+        if (AudioEditManager.Instance.IsControlRunning) return;
         if (ItemPrefab == null || ContentRoot == null || editModel == null)
         {
             Debug.LogError("[mUIDrumsInspectorPanel] 组件未就绪，刷新失败");
@@ -223,7 +225,7 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
             {
                 var timeHand = GameObject.FindObjectOfType<UIAudioEditTimeHand>();
                 if (timeHand != null)
-                    timeHand.SetTime(time);
+                    timeHand.SetTime(time, true);
             });
         }
 
@@ -330,6 +332,82 @@ public class mUIDrumsInspectorPanel : MonoBehaviour, IController
         TheTypeOfOperation.SwipeDown => 4,
         _ => 99
     };
+    // #redgin // [跳转到最近鼓点] -- mixyao/07/04
+    public void MoveToNearestDrum()
+    {
+        if (editModel == null || editModel.TimeLineData == null || editModel.TimeLineData.Count == 0)
+            return;
+
+        float now = editModel.ThisTime;
+        float? nearest = null;
+
+        foreach (var time in editModel.TimeLineData.Keys)
+        {
+            if (nearest == null || Mathf.Abs(time - now) < Mathf.Abs(nearest.Value - now))
+            {
+                nearest = time;
+            }
+        }
+
+        if (nearest.HasValue)
+        {
+            var timeHand = GameObject.FindObjectOfType<UIAudioEditTimeHand>();
+            if (timeHand != null)
+            {
+                timeHand.SetTime((float)Math.Round(nearest.Value, 2), true);
+            }
+        }
+    }
+
+    // #redgin // [跳转到上一个鼓点] -- mixyao/07/04
+    public void MoveToPreviousDrum()
+    {
+        if (editModel == null || editModel.TimeLineData == null || editModel.TimeLineData.Count == 0)
+            return;
+
+        float now = editModel.ThisTime;
+        float? previous = null;
+
+        foreach (var time in editModel.TimeLineData.Keys)
+        {
+            if (time < now && (!previous.HasValue || time > previous.Value))
+            {
+                previous = time;
+            }
+        }
+
+        if (previous.HasValue)
+        {
+            var timeHand = GameObject.FindObjectOfType<UIAudioEditTimeHand>();
+            if (timeHand != null)
+                timeHand.SetTime((float)Math.Round(previous.Value, 2), true);
+        }
+    }
+
+    // #redgin // [跳转到下一个鼓点] -- mixyao/07/04
+    public void MoveToNextDrum()
+    {
+        if (editModel == null || editModel.TimeLineData == null || editModel.TimeLineData.Count == 0)
+            return;
+
+        float now = editModel.ThisTime;
+        float? next = null;
+
+        foreach (var time in editModel.TimeLineData.Keys)
+        {
+            if (time > now && (!next.HasValue || time < next.Value))
+            {
+                next = time;
+            }
+        }
+
+        if (next.HasValue)
+        {
+            var timeHand = GameObject.FindObjectOfType<UIAudioEditTimeHand>();
+            if (timeHand != null)
+                timeHand.SetTime((float)Math.Round(next.Value, 2), true);
+        }
+    }
 
     public IArchitecture GetArchitecture() => GameBody.Interface;
 }

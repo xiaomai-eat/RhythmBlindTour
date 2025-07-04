@@ -306,7 +306,7 @@ public class UIDrawAScale : MonoBehaviour, IController
     public void MoveNextMeasure()
     {
         float beatDuration = 60f / editModel.BPM;
-        float measureDuration = beatDuration * editModel.BeatB;
+        float measureDuration = beatDuration * editModel.BeatA; // 修正这里
         float newTime = editModel.ThisTime + measureDuration;
         this.SendCommand(new SetAudioEditThisTimeCommand(newTime));
     }
@@ -314,10 +314,11 @@ public class UIDrawAScale : MonoBehaviour, IController
     public void MovePrevMeasure()
     {
         float beatDuration = 60f / editModel.BPM;
-        float measureDuration = beatDuration * editModel.BeatB;
+        float measureDuration = beatDuration * editModel.BeatA; // 修正这里
         float newTime = Mathf.Max(0f, editModel.ThisTime - measureDuration);
         this.SendCommand(new SetAudioEditThisTimeCommand(newTime));
     }
+
     public IArchitecture GetArchitecture()
     {
         return GameBody.Interface;

@@ -84,6 +84,21 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
                 PressTime += Time.deltaTime;
             }
         }
+        if (targetScrollValue.HasValue)
+        {
+            float current = ScrollRect.horizontalScrollbar.value;
+            float target = targetScrollValue.Value;
+            float delta = Time.deltaTime * scrollLerpSpeed;
+
+            float newValue = Mathf.MoveTowards(current, target, delta);
+            ScrollRect.horizontalScrollbar.value = newValue;
+
+            if (Mathf.Approximately(newValue, target))
+            {
+                targetScrollValue = null; // 插值完成
+            }
+        }
+
         #endregion
 
         // [inputSystem 重新规划] -- mixyao/25/07/02
@@ -124,7 +139,49 @@ public class UIAudioEditTimeHand : MonoBehaviour, IController, IPointerClickHand
     public void SetTime(float Time)
     {
         this.SendCommand(new SetAudioEditThisTimeCommand(Time));
+
     }
+    public void SetZero()
+    {
+        int Time = 0;
+        SetTime(Time);
+        if (Mathf.Approximately(Time, 0f))
+        {
+            // 时间为 0 时，无论是否跟随都将滚动条归位
+            ScrollRect.horizontalScrollbar.value = 0f;
+            targetScrollValue = null;
+            return;
+        }
+    }
+    private float? targetScrollValue = null;
+    private float scrollLerpSpeed = 1f / 0.01f; // 0.01秒内完成（100倍速）
+
+    public void SetTime(float time, bool isFollow = false)
+    {
+        this.SendCommand(new SetAudioEditThisTimeCommand(time));
+
+        if (ScrollRect != null)
+        {
+            float scrollRange = this.SendQuery(new QueryAudioEditAudioClipLength());
+
+            if (Mathf.Approximately(time, 0))
+            {
+                ScrollRect.horizontalScrollbar.value = 0f;
+                targetScrollValue = null;
+            }
+            else if (isFollow)
+            {
+                float viewWidth = ScrollRect.viewport.rect.width;
+                float contentWidth = ScrollRect.content.rect.width;
+                float centerPixel = time * _PixelUnitsPerSecond - viewWidth / 2f;
+                float scrollValue = Mathf.Clamp01(centerPixel / (contentWidth - viewWidth));
+
+                targetScrollValue = scrollValue; // 由 Update 插值到目标值
+            }
+        }
+    }
+
+
     public void AddTime(float Speed)
     {
         this.SendCommand(

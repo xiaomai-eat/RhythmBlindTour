@@ -11,6 +11,7 @@ using Qf.Models;
 using Qf.Models.AudioEdit;
 using QFramework;
 using Unity.Burst.Intrinsics;
+using Qf.Managers;
 
 public class UIAttributeSetPanel : MonoBehaviour, IController
 {
@@ -52,6 +53,9 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
         this.RegisterEvent<OnUpdateThisTime>(v =>
         {
             if (editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+            if (AudioEditManager.Instance != null && AudioEditManager.Instance.IsControlRunning) return;
+
+            if (editModel.Mode.Equals(SystemModeData.PlayMode)) return;
             index = 0;
             if (editModel.TimeLineData.ContainsKey(v.ThisTime))
             {
@@ -72,6 +76,12 @@ public class UIAttributeSetPanel : MonoBehaviour, IController
 
         this.RegisterEvent<OnUpdateAudioEditDrumsUI>(v =>
         {
+            if (editModel.Mode.Equals(SystemModeData.PlayMode)) return;
+
+
+            if (AudioEditManager.Instance != null && AudioEditManager.Instance.IsControlRunning) return;
+
+
             if (editModel.Mode.Equals(SystemModeData.PlayMode)) return;
 
             if (editModel.TimeLineData.ContainsKey(editModel.ThisTime))

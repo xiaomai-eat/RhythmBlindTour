@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using Qf.Systems;
 
-/// <summary>
-/// 替代 Unity InputSystem 的手动输入映射配置器（支持 Inspector 自定义初始映射）
-/// </summary>
 public class mInputMappingConfigurator : MonoBehaviour
 {
-    [Header("建议自定义映射（可在 Inspector 中设置）")]
+    public enum InputModeType { None, Edit, Play, UI }
+
+    [Header("当前输入响应模式")]
+    public InputModeType inputModeType = InputModeType.Edit;
+
+    [Header("Edit 模式键位设置（每个操作一个键）")]
     public KeyCode mKey_Quit = KeyCode.Escape;
     public KeyCode mKey_Sure = KeyCode.Return;
     public KeyCode mKey_SwipeUp = KeyCode.UpArrow;
@@ -17,208 +20,322 @@ public class mInputMappingConfigurator : MonoBehaviour
     public KeyCode mKey_SwipeRight = KeyCode.RightArrow;
     public KeyCode mKey_Click = KeyCode.Space;
 
-    // [默认键位字典] -- mixyao/25/07/02
-    private Dictionary<string, List<KeyCode>> mDefaultMappingSet;
+    [Header("UI 输入映射列表")]
+    public List<UIInputMapping> mUIInputMappings = new();
+
+    [Header("Play 模式键位设置（每个操作多个键）")]
+    public KeyCode[] pKeys_Quit = new KeyCode[] { KeyCode.Escape };
+    public KeyCode[] pKeys_Sure = new KeyCode[] { KeyCode.Return, KeyCode.Space };
+    public KeyCode[] pKeys_SwipeUp = new KeyCode[] { KeyCode.W, KeyCode.UpArrow };
+    public KeyCode[] pKeys_SwipeDown = new KeyCode[] { KeyCode.S, KeyCode.DownArrow };
+    public KeyCode[] pKeys_SwipeLeft = new KeyCode[] { KeyCode.A, KeyCode.LeftArrow };
+    public KeyCode[] pKeys_SwipeRight = new KeyCode[] { KeyCode.D, KeyCode.RightArrow };
+    public KeyCode[] pKeys_Click = new KeyCode[] { KeyCode.Space, KeyCode.Return };
+    [Header("模式选择")]
+    private InputModeType mLastAppliedMode = InputModeType.None;
 
     void Awake()
     {
-        mDefaultMappingSet = new Dictionary<string, List<KeyCode>>()
+        ApplyModeChange(inputModeType);
+    }
+
+    void LateUpdate()
+    {
+        if (Input.GetKeyDown(KeyCode.F9))
         {
-            { "Quit", new List<KeyCode>{ mKey_Quit } },
-            { "Sure", new List<KeyCode>{ mKey_Sure } },
-            { "SwipeUp", new List<KeyCode>{ mKey_SwipeUp } },
-            { "SwipeDown", new List<KeyCode>{ mKey_SwipeDown } },
-            { "SwipeLeft", new List<KeyCode>{ mKey_SwipeLeft } },
-            { "SwipeRight", new List<KeyCode>{ mKey_SwipeRight } },
-            { "Click", new List<KeyCode>{ mKey_Click } }
+            SaveAllMapsToJson();
+        }
+
+        if (inputModeType != mLastAppliedMode)
+        {
+            ApplyModeChange(inputModeType);
+            mLastAppliedMode = inputModeType;
+        }
+
+        switch (inputModeType)
+        {
+            case InputModeType.UI:
+                foreach (var map in mUIInputMappings)
+                {
+                    bool triggered = map.triggerType switch
+                    {
+                        InputTriggerType.Click => InputSystems.InputQuery(map.groupName),
+                        InputTriggerType.Down => InputSystems.InputQuery(map.groupName),
+                        InputTriggerType.Up => Input.GetKeyUp(map.keyCode),
+                        _ => false
+                    };
+
+                    if (triggered)
+                    {
+                        map.targetItem?.TriggerClick();
+                    }
+                }
+                break;
+
+            case InputModeType.Edit:
+            case InputModeType.Play:
+                // 统一处理 Edit / Play 输入
+                CheckStandardInputs();
+                break;
+        }
+    }
+    private void CheckStandardInputs()
+    {
+        if (InputSystems.InputQuery("Click"))
+            Debug.Log("[Input] Click 被触发");
+
+        if (InputSystems.InputQuery("Sure"))
+            Debug.Log("[Input] Sure 被触发");
+
+        if (InputSystems.InputQuery("Quit"))
+            Debug.Log("[Input] Quit 被触发");
+
+        if (InputSystems.InputQuery("SwipeUp"))
+            Debug.Log("[Input] SwipeUp 被触发");
+
+        if (InputSystems.InputQuery("SwipeDown"))
+            Debug.Log("[Input] SwipeDown 被触发");
+
+        if (InputSystems.InputQuery("SwipeLeft"))
+            Debug.Log("[Input] SwipeLeft 被触发");
+
+        if (InputSystems.InputQuery("SwipeRight"))
+            Debug.Log("[Input] SwipeRight 被触发");
+    }
+
+
+    void ApplyModeChange(InputModeType mode)
+    {
+        InputSystems.ClearKey("PlayClick");
+
+        if (mode == InputModeType.None)
+        {
+            foreach (var key in InputSystems.GetAllKeyNames().ToList())
+                InputSystems.ClearKey(key);
+        }
+        else if (mode == InputModeType.Edit)
+        {
+            LoadEditMap();
+        }
+        else if (mode == InputModeType.Play)
+        {
+            LoadPlayMap();
+        }
+        else if (mode == InputModeType.UI)
+        {
+            RegisterAllUIInputMappings();
+        }
+    }
+
+    void RegisterAllUIInputMappings()
+    {
+        foreach (var map in mUIInputMappings)
+        {
+            InputSystems.ClearKey(map.groupName);
+            InputSystems.AddKey(map.groupName, map.keyCode);
+        }
+    }
+
+    public void SwitchToNone()
+    {
+        inputModeType = InputModeType.None;
+        Debug.Log("[Switch] 切换至 None 模式");
+        PrintCurrentInputMap(InputModeType.None);
+    }
+
+    public void SwitchToEdit()
+    {
+        inputModeType = InputModeType.Edit;
+        Debug.Log("[Switch] 切换至 Edit 模式");
+        PrintCurrentInputMap(InputModeType.Edit);
+    }
+
+    public void SwitchToPlay()
+    {
+        inputModeType = InputModeType.Play;
+        Debug.Log("[Switch] 切换至 Play 模式");
+        PrintCurrentInputMap(InputModeType.Play);
+    }
+
+    public void SwitchToUI()
+    {
+        inputModeType = InputModeType.UI;
+        Debug.Log("[Switch] 切换至 UI 模式");
+        PrintCurrentInputMap(InputModeType.UI);
+    }
+    private void PrintCurrentInputMap(InputModeType mode)
+    {
+        string path = mode switch
+        {
+            InputModeType.Edit => RuntimeJsonPath_Edit,
+            InputModeType.Play => RuntimeJsonPath_Play,
+            InputModeType.UI => RuntimeJsonPath_UI,
+            _ => "(无映射)"
         };
 
-        PrepareInputMap();
-        LoadMappingsFromJson();
-    }
-
-    /// <summary>
-    /// 第一次运行时从 StreamingAssets 拷贝 inputMap.json 到 persistentDataPath
-    /// </summary>
-    void PrepareInputMap()
-    {
-        string dst = RuntimeJsonPath;
-        if (!File.Exists(dst))
+        if (!File.Exists(path))
         {
-#if UNITY_ANDROID && !UNITY_EDITOR
-            string src = DefaultJsonPath;
-            var www = new UnityEngine.Networking.UnityWebRequest(src);
-            www.downloadHandler = new UnityEngine.Networking.DownloadHandlerBuffer();
-            www.SendWebRequest();
-            while (!www.isDone) { }
-            if (string.IsNullOrEmpty(www.error))
-                File.WriteAllText(dst, www.downloadHandler.text);
-#else
-            string src = DefaultJsonPath;
-            if (File.Exists(src))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(dst));
-                File.Copy(src, dst);
-            }
-#endif
+            Debug.LogWarning($"[InputMap] 当前模式 {mode} 映射文件不存在: {path}");
+            return;
         }
-    }
 
-    /// <summary>
-    /// 从 JSON 文件加载键位映射配置，并补齐缺失键为默认 -- mixyao/25/07/02
-    /// </summary>
-    public void LoadMappingsFromJson()
-    {
-        string path = RuntimeJsonPath;
-        InputKeyMap finalMap = new InputKeyMap();
+        string json = File.ReadAllText(path);
+        Debug.Log($"[InputMap] 当前模式: {mode}");
+        Debug.Log($"[InputMap] 加载路径: {path}");
 
-        if (File.Exists(path))
+        if (mode == InputModeType.UI)
         {
-            string json = File.ReadAllText(path);
+            var wrapper = JsonUtility.FromJson<UIMapWrapper>(json);
+            foreach (var mapping in wrapper.uiMappings)
+            {
+                Debug.Log($"[UIMap] group: {mapping.groupName}, key: {mapping.keyCode}, trigger: {mapping.triggerType}, target: {mapping.targetItem?.name}");
+            }
+        }
+        else
+        {
             var map = JsonUtility.FromJson<InputKeyMap>(json);
-
             foreach (var kv in map.KeyBindings)
-                finalMap.KeyBindings[kv.Key] = kv.Value;
-        }
-
-        // [补充缺失操作键] -- mixyao/25/07/02
-        foreach (var def in mDefaultMappingSet)
-        {
-            if (!finalMap.KeyBindings.ContainsKey(def.Key) || finalMap.KeyBindings[def.Key] == null || finalMap.KeyBindings[def.Key].Count == 0)
             {
-                finalMap.KeyBindings[def.Key] = def.Value.ConvertAll(k => (int)k);
+                string keys = string.Join(", ", kv.Value.ConvertAll(i => ((KeyCode)i).ToString()));
+                Debug.Log($"[InputMap] 操作名: {kv.Key} → 按键: {keys}");
             }
         }
-
-        foreach (var kv in finalMap.KeyBindings)
-        {
-            List<KeyCode> keyCodes = kv.Value.ConvertAll(i => (KeyCode)i);
-            InputSystems.ClearKey(kv.Key);
-            InputSystems.AddKey(kv.Key, keyCodes.ToArray());
-        }
-
-        UpdatePlayClickComposite();
     }
 
-    /// <summary>
-    /// 保存当前 InputSystems 的键位配置为 JSON 文件（UTF-8 编码）
-    /// </summary>
-    public void SaveAllMappingsToJson()
+    public void SaveEditMapToJson()
     {
-        var map = new InputKeyMap();
-        foreach (var key in InputSystems.GetAllKeyNames())
-        {
-            var codes = InputSystems.GetKeys(key);
-            if (codes != null)
-                map.KeyBindings[key] = codes.ConvertAll(k => (int)k);
-        }
+        var dict = new Dictionary<string, List<int>>
+    {
+        { "Quit", new List<int> { (int)mKey_Quit } },
+        { "Sure", new List<int> { (int)mKey_Sure } },
+        { "SwipeUp", new List<int> { (int)mKey_SwipeUp } },
+        { "SwipeDown", new List<int> { (int)mKey_SwipeDown } },
+        { "SwipeLeft", new List<int> { (int)mKey_SwipeLeft } },
+        { "SwipeRight", new List<int> { (int)mKey_SwipeRight } },
+        { "Click", new List<int> { (int)mKey_Click } }
+    };
 
+        var map = new InputKeyMap { KeyBindings = dict }; // ✅ 通过 setter 设置 entries
         var json = JsonUtility.ToJson(map, true);
-        Directory.CreateDirectory(Path.GetDirectoryName(RuntimeJsonPath));
-        File.WriteAllText(RuntimeJsonPath, json, System.Text.Encoding.UTF8);
+        string path = RuntimeJsonPath_Edit;
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        File.WriteAllText(path, json);
 
-        Debug.Log($"已保存输入映射至 JSON: {RuntimeJsonPath}");
+        Debug.Log($"[EditMap] 已保存至: {path}");
+        Debug.Log($"[EditMap] 内容如下:\n{json}");
     }
 
-    /// <summary>
-    /// 将 Inspector 设置应用为当前配置（不读写 JSON）
-    /// </summary>
-    public void ApplyInitialMappingsFromInspector()
+
+    public void LoadEditMap()
     {
-        foreach (var kv in mDefaultMappingSet)
+        if (!File.Exists(RuntimeJsonPath_Edit)) return;
+
+        string json = File.ReadAllText(RuntimeJsonPath_Edit);
+        var map = JsonUtility.FromJson<InputKeyMap>(json);
+        foreach (var kv in map.KeyBindings)
         {
+            var keys = kv.Value.ConvertAll(i => (KeyCode)i);
             InputSystems.ClearKey(kv.Key);
-            InputSystems.AddKey(kv.Key, kv.Value.ToArray());
-        }
-
-        UpdatePlayClickComposite();
-    }
-
-    /// <summary>
-    /// 设置指定操作的新按键，并保存
-    /// </summary>
-    public void SetKey(string action, KeyCode key)
-    {
-        InputSystems.ClearKey(action);
-        InputSystems.AddKey(action, key);
-        SaveAllMappingsToJson();
-
-        if (action is "SwipeUp" or "SwipeDown" or "SwipeLeft" or "SwipeRight" or "Click")
-            UpdatePlayClickComposite();
-    }
-
-    /// <summary>
-    /// 给指定操作添加一个附加按键，并保存
-    /// </summary>
-    public void AddKey(string action, KeyCode extraKey)
-    {
-        InputSystems.AddKey(action, extraKey);
-        SaveAllMappingsToJson();
-    }
-
-    /// <summary>
-    /// 重置为 Inspector 默认映射并保存
-    /// </summary>
-    public void ResetAllToInspectorValues()
-    {
-        ApplyInitialMappingsFromInspector();
-        SaveAllMappingsToJson();
-    }
-
-    /// <summary>
-    /// 组合 PlayClick 的复合按键映射（确保各键存在） -- mixyao/25/07/02
-    /// </summary>
-    void UpdatePlayClickComposite()
-    {
-        var keys = new List<KeyCode>();
-
-        void AddIfExists(string name)
-        {
-            var k = InputSystems.GetKeys(name);
-            if (k != null)
-                keys.AddRange(k);
-        }
-
-        AddIfExists("SwipeUp");
-        AddIfExists("SwipeDown");
-        AddIfExists("SwipeLeft");
-        AddIfExists("SwipeRight");
-        AddIfExists("Click");
-
-        InputSystems.ClearKey("PlayClick");
-        InputSystems.AddKey("PlayClick", keys.ToArray());
-    }
-    void Update()
-    {
-        // [按 R 键强制应用当前映射并保存] -- mixyao/25/07/02
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            ApplyCurrentMappings();
-            Debug.Log("当前映射已应用并保存 (R)");
+            InputSystems.AddKey(kv.Key, keys.ToArray());
         }
     }
-
-    /// <summary>
-    /// [将当前所有按键设置应用到 InputSystems 并保存] -- mixyao/25/07/02
-    /// </summary>
-    public void ApplyCurrentMappings()
+    public void SavePlayMapToJson()
     {
-        foreach (var kv in mDefaultMappingSet)
+        var dict = new Dictionary<string, List<int>>
+    {
+        { "Quit", pKeys_Quit.Select(k => (int)k).ToList() },
+        { "Sure", pKeys_Sure.Select(k => (int)k).ToList() },
+        { "SwipeUp", pKeys_SwipeUp.Select(k => (int)k).ToList() },
+        { "SwipeDown", pKeys_SwipeDown.Select(k => (int)k).ToList() },
+        { "SwipeLeft", pKeys_SwipeLeft.Select(k => (int)k).ToList() },
+        { "SwipeRight", pKeys_SwipeRight.Select(k => (int)k).ToList() },
+        { "Click", pKeys_Click.Select(k => (int)k).ToList() }
+    };
+
+        var map = new InputKeyMap { KeyBindings = dict };
+        var json = JsonUtility.ToJson(map, true);
+        string path = RuntimeJsonPath_Play;
+        Directory.CreateDirectory(Path.GetDirectoryName(path));
+        File.WriteAllText(path, json);
+
+        Debug.Log($"[PlayMap] 已保存至: {path}");
+        Debug.Log($"[PlayMap] 内容如下:\n{json}");
+    }
+
+
+
+    public void LoadPlayMap()
+    {
+        if (!File.Exists(RuntimeJsonPath_Play)) return;
+
+        string json = File.ReadAllText(RuntimeJsonPath_Play);
+        var map = JsonUtility.FromJson<InputKeyMap>(json);
+        foreach (var kv in map.KeyBindings)
         {
-            InputSystems.AddKey(kv.Key); // 确保注册
+            var keys = kv.Value.ConvertAll(i => (KeyCode)i);
             InputSystems.ClearKey(kv.Key);
-            InputSystems.AddKey(kv.Key, kv.Value.ToArray());
+            InputSystems.AddKey(kv.Key, keys.ToArray());
         }
-
-        UpdatePlayClickComposite();
-        SaveAllMappingsToJson();
     }
 
-    // === 路径定义 ===
-    public static string DefaultJsonPath =>
-        Path.Combine(Application.streamingAssetsPath, "KeyMap/inputMap.json");
+    public void SaveAllMapsToJson()
+    {
+        SaveEditMapToJson();
+        SavePlayMapToJson();
 
-    public static string RuntimeJsonPath =>
-        Path.Combine(Application.persistentDataPath, "KeyMap/inputMap.json");
+
+        // === 3. 保存 UIMap.json（UIInputMapping List）===
+        var uiList = new UIMapWrapper();
+        uiList.uiMappings = mUIInputMappings;
+        File.WriteAllText(RuntimeJsonPath_UI, JsonUtility.ToJson(uiList, true), System.Text.Encoding.UTF8);
+
+        Debug.Log("[SaveAllMapsToJson] 所有输入配置已保存至 JSON 文件。");
+    }
+
+
+    // === 文件路径 ===
+    public static string RuntimeJsonPath_Edit =>
+        Path.Combine(Application.persistentDataPath, "KeyMap/EditMap.json");
+
+    public static string RuntimeJsonPath_Play =>
+        Path.Combine(Application.persistentDataPath, "KeyMap/PlayMap.json");
+
+    public static string RuntimeJsonPath_UI =>
+        Path.Combine(Application.persistentDataPath, "KeyMap/UIMap.json");
 }
 
+
+[System.Serializable]
+public struct UIInputMapping
+{
+    public string groupName;
+    public KeyCode keyCode;
+    public InputTriggerType triggerType;
+    public UIEventsItem targetItem;
+}
+
+[System.Serializable]
+public struct UIInputMappingSerializable
+{
+    public string groupName;
+    public KeyCode keyCode;
+    public InputTriggerType triggerType;
+}
+
+[System.Serializable]
+public class UIInputMapWrapper
+{
+    public List<UIInputMappingSerializable> entries;
+}
+
+public enum InputTriggerType
+{
+    Click,
+    Down,
+    Up
+}
+[System.Serializable]
+public class UIMapWrapper
+{
+    public List<UIInputMapping> uiMappings;
+}
