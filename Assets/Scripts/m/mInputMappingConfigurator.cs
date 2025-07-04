@@ -38,7 +38,10 @@ public class mInputMappingConfigurator : MonoBehaviour
     {
         ApplyModeChange(inputModeType);
     }
-
+    void Start()
+    {
+        SaveAllMapsToJson();
+    }
     void LateUpdate()
     {
         if (Input.GetKeyDown(KeyCode.F9))
